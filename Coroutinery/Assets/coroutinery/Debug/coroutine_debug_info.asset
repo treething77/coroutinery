@@ -1,0 +1,183 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dd625b7561e35043bd83d29c117e185, type: 3}
+  m_Name: coroutine_debug_info
+  m_EditorClassIdentifier: 
+  sourceMapping:
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <Delay>d__0
+    typeNamespace: 
+    stateSourcePoints: c01c0000c41c0000c31c0000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <Delay>d__1
+    typeNamespace: 
+    stateSourcePoints: ce1c0000cf1c0000d21c0000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <Delay>d__2`1
+    typeNamespace: 
+    stateSourcePoints: de1c0000df1c0000e21c0000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <DelayFrames>d__3
+    typeNamespace: 
+    stateSourcePoints: ed1c0000ee1c0000f11c0000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <CancelWith>d__4
+    typeNamespace: 
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <CancelWith>d__5
+    typeNamespace: 
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <CancelWith>d__6`1
+    typeNamespace: 
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <CancelWith>d__7
+    typeNamespace: 
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <PauseWith>d__8
+    typeNamespace: 
+    stateSourcePoints: 341d00003c1d0000411d0000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <PauseWith>d__9
+    typeNamespace: 
+    stateSourcePoints: 4d1d0000551d00005a1d0000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <PauseWith>d__10`1
+    typeNamespace: 
+    stateSourcePoints: 661d0000701d0000751d0000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <PauseWith>d__11
+    typeNamespace: 
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <KillWith>d__12
+    typeNamespace: 
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <Append>d__13
+    typeNamespace: 
+    stateSourcePoints: 9a1d00009b1d0000a01d0000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <Append>d__14
+    typeNamespace: 
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <Prepend>d__15
+    typeNamespace: 
+    stateSourcePoints: ba1d0000bc1d0000bf1d0000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <Prepend>d__16
+    typeNamespace: 
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <Superimpose>d__18
+    typeNamespace: 
+    stateSourcePoints: e51d0000f01d0000f21d0000f41d0000f61d0000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <Hijack>d__19
+    typeNamespace: 
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <RerouteExceptions>d__20
+    typeNamespace: 
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\coroutinery\Scripts\MECTest.cs
+    typeName: <_CheckForWin>d__1
+    typeNamespace: 
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\coroutinery\Scripts\MECTest.cs
+    typeName: <_CheckForDone>d__2
+    typeNamespace: 
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\coroutinery\Examples\Basic\BasicTest.cs
+    typeName: <NestedTest>d__2
+    typeNamespace: aeric.demos
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\coroutinery\Examples\Basic\BasicTest.cs
+    typeName: <SpinIt>d__3
+    typeNamespace: aeric.demos
+    stateSourcePoints: 290000002e00000034000000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\coroutinery\Examples\Basic\BasicTest.cs
+    typeName: <MoveIt>d__4
+    typeNamespace: aeric.demos
+    stateSourcePoints: 390000003e00000043000000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\coroutinery\Examples\Basic\BasicTestUnity.cs
+    typeName: <NestedTest>d__1
+    typeNamespace: aeric.demos
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\coroutinery\Examples\Basic\BasicTestUnity.cs
+    typeName: <SpinIt>d__2
+    typeNamespace: aeric.demos
+    stateSourcePoints: 2a0000002f00000035000000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\coroutinery\Examples\Basic\BasicTestUnity.cs
+    typeName: <MoveIt>d__3
+    typeNamespace: aeric.demos
+    stateSourcePoints: 3a0000003f00000044000000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <_EOFPumpWatcher>d__137
+    typeNamespace: MEC
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <_EOFPump>d__138
+    typeNamespace: MEC
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <_StartWhenDone>d__280
+    typeNamespace: MEC
+    stateSourcePoints: c5140000ce140000cd140000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <_StartWhenDone>d__285
+    typeNamespace: MEC
+    stateSourcePoints: 28150000291500002f150000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <_StartWhenDone>d__287
+    typeNamespace: MEC
+    stateSourcePoints: 44150000451500004b150000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <_StartWhenDone>d__292
+    typeNamespace: MEC
+    stateSourcePoints: 721500007315000079150000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <_InjectDelay>d__293
+    typeNamespace: MEC
+    stateSourcePoints: 7c1500007f15000082150000
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <_DelayedCall>d__318
+    typeNamespace: MEC
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <_WatchCall>d__339
+    typeNamespace: MEC
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <_CallContinuously>d__340
+    typeNamespace: MEC
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <_WatchCall>d__357`1
+    typeNamespace: MEC
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <_CallContinuously>d__358`1
+    typeNamespace: MEC
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <_OnDestroy>d__32
+    typeNamespace: MEC
+    stateSourcePoints: 
+  - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\competitors\Trinary Software\Timing.cs
+    typeName: <_OnDestroy>d__33
+    typeNamespace: MEC
+    stateSourcePoints: 101b0000111b0000141b0000
