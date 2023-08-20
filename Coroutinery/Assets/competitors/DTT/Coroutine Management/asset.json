@@ -1,0 +1,8 @@
+{
+    "assetStoreRelease": true,
+    "packageName": "dtt.coroutinemanagement",
+    "version": "7.1.1",
+    "displayName": "Coroutine Management",
+    "documentationUrl": "Documentation.pdf",
+    "customIconPath": ""
+}

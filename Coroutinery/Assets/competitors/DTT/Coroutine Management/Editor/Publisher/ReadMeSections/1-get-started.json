@@ -1,0 +1,12 @@
+{
+    "title": "Coroutine Management: get started quickly",
+    "text": "[To get started, import the 'DTT.Utils.CoroutineManagement' namespace into your script. Now you can make use of the static class called 'CoroutineManager'. With this class you can make use of different methods to wait before a method is executed. For example you can use the 'WaitForSeconds(int seconds, Action callback)' method to wait for a certain amount of seconds. Check out our documentation for the full list of possible operations.][l][Every method that you can use on the CoroutineManager has a parameter called 'callback'. This is an Action delegate you can use to execute your own code when the waiting has finished. The method you can pass in this parameter should have no return type and parameters. If you want to find out more take a look at our documentation for examples and explanations.]",
+    "links": [
+        {
+            "text": "Open Documentation",
+            "url": "Documentation.pdf",
+            "inline": false
+        }
+    ],
+    "imageUrls": []
+}

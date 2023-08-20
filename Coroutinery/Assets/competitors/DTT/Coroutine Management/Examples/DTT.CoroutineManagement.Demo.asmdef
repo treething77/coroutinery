@@ -1,0 +1,15 @@
+{
+    "name": "DTT.CoroutineManagement.Demo",
+    "references": [
+        "GUID:7e1e1143b55f3a3469097be0a8e47f66"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

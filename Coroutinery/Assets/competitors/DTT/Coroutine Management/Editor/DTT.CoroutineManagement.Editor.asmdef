@@ -1,0 +1,17 @@
+{
+    "name": "DTT.CoroutineManagement.Editor",
+    "references": [
+        "GUID:b5e078f64d95bba4a8ba03b5b4940114"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
