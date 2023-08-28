@@ -26,59 +26,6 @@ namespace aeric.coroutinery {
 
         private static void OnAssemblyCompilationFinished(string assemblyPath, CompilerMessage[] arg2)
         { 
-            
-            //Load the asset that contains the coroutine debug info
-            //Look at our default path
-            string defaultPath = "Assets/coroutinery/Debug/";
-            string filename = "coroutine_debug_info.asset";
-            string fullPath = defaultPath + filename;
-            CoroutineDebugInfo debugAsset = null;
-            {
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                debugAsset = AssetDatabase.LoadAssetAtPath<CoroutineDebugInfo>(fullPath);
-                if (debugAsset == null)
-                {
-                    //Maybe it got moved?
-                    string[] debugAssets = AssetDatabase.FindAssets("t:CoroutineDebugInfo");
-                    if (debugAssets.Length == 0)
-                    {
-                        //No asset so lets create one
-                        debugAsset = ScriptableObject.CreateInstance<CoroutineDebugInfo>();
-                        AssetDatabase.CreateAsset(debugAsset, fullPath);
-                    }
-                    else
-                    {
-                        //If we have more than one just take the first one
-                        if (debugAssets.Length > 1)
-                        {
-                            Debug.LogWarning("Multiple CoroutineDebugInfo assets found:");
-                            foreach (var d in debugAssets)
-                            {
-                                Debug.LogWarning(d);
-                            }
-                        }
-
-                        fullPath = debugAssets[0];
-                        debugAsset = AssetDatabase.LoadAssetAtPath<CoroutineDebugInfo>(fullPath);
-                    }
-                }
-
-                if (debugAsset == null)
-                {
-                    //we failed to find or create the asset
-                    Debug.LogError("Failed to find or create CoroutineDebugInfo asset");
-                    return;
-                }
-
-                //clear out any existing data, we are going to recreate it entirely
-                debugAsset.ClearData();
-                
-                stopwatch.Stop();
-                Debug.Log($"Time loading debug asset: {stopwatch.ElapsedMilliseconds} ms");
-
-            }
             //  Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
             //foreach (var assembly in assemblies) {
@@ -89,6 +36,8 @@ namespace aeric.coroutinery {
 
             if (processAssembly)
             {
+                CoroutineDebugInfo debugAsset = LoadCoroutineDebugAsset();
+
                 Debug.Log($"Scanning assembly: {assemblyPath}");
 
                 Stopwatch stopwatch = new Stopwatch();
@@ -121,9 +70,12 @@ namespace aeric.coroutinery {
                     enumeratorTypes = TypeCache.GetTypesDerivedFrom<IEnumerator>();
 
                     stopwatch2.Stop();
-                    Debug.Log($"Time loading types: {stopwatch2.ElapsedMilliseconds} ms");
+                    Debug.Log($"Time loading types: {stopwatch2.ElapsedMilliseconds} ms foasdasdr {enumeratorTypes.Count}");
                     
                 }
+
+                var assemblyDebugAsset = debugAsset.GetAssemblySourceMapping(assemblyDef.Name.Name);
+                assemblyDebugAsset.ClearData();
 
               //  Type[] types = a.GetTypes();
 
@@ -131,11 +83,13 @@ namespace aeric.coroutinery {
 
                 foreach (var type in enumeratorTypes)
                 {
-                    if (!type.Assembly.Location.Contains("ScriptAssemblies")) continue;
-                    if (type.Assembly.FullName != assemblyDef.FullName) continue;
+                //    if (!type.Assembly.Location.Contains("ScriptAssemblies")) continue;
+                  //  if (type.Assembly.FullName != assemblyDef.FullName) continue;
                     
                     if (type.GetCustomAttribute<CompilerGeneratedAttribute>() != null)
                     {
+                        Debug.Log($" ----- compiler generated type: {type.Name}");
+
                         CoroutineSourceMapping sourceMapping = new CoroutineSourceMapping();
                         sourceMapping.typeName = type.Name;
                         sourceMapping.typeNamespace = type.Namespace;
@@ -144,11 +98,26 @@ namespace aeric.coroutinery {
                         //names don't match
                         //one uses '/' as a split the other uses '+'
 
-                        string fixedClassName = type.FullName.Replace("+<", "/<");
-                        //   Debug.Log($"Coroutine class: {fixedClassName}");
+                        Debug.Log($" ----- compiler generated type full name: {type.FullName}");
 
-                        var coroutineTypeDef = typeDefs.First(x => x.FullName == fixedClassName);
-                        
+                        string fixedClassName = type.FullName.Replace("+<", "/<");
+                        //   Debug.Log($"Coroutine class:   {fixedClassName}");
+
+                        TypeDefinition coroutineTypeDef = null;
+
+                        foreach(var t in typeDefs)
+                        {
+                            if (t.FullName == fixedClassName)
+                            {
+                                coroutineTypeDef = t;
+                                break;
+                            }
+                        }
+                        if (coroutineTypeDef == null)
+                        {
+                           // Debug.LogError($"Failed to find type definition for {fixedClassName}");
+                            continue;
+                        }
                         
                         //TODO: error if null
 
@@ -167,6 +136,39 @@ namespace aeric.coroutinery {
                                     instructions.FirstOrDefault(i => i.OpCode.Code == Code.Switch);
                                 if (stateSwitch == null)
                                 {
+                                    //Simple coroutines might not have a switch on the current state
+                                    //in that case we just use the first instruction after the yield return
+
+                                    foreach(var instr in instructions)
+                                    {
+                                   //     Debug.Log(instr);
+                                    }
+
+                                    stateSwitch = instructions.FirstOrDefault(i =>
+                                                                           i.OpCode.Code == Code.Ldc_I4_1 && i.Next != null &&
+                                                                                                                  i.Next.OpCode.Code == Code.Ret);
+                                    if (stateSwitch == null)
+                                        continue;
+
+                                    SequencePoint destSeqPt = null;
+
+                                    do
+                                    {
+                                        destSeqPt = m.DebugInformation.GetSequencePoint(stateSwitch);
+                                        //TODO: temp constant to skip invalid lines
+                                        if (destSeqPt != null && destSeqPt.StartLine < 100000)
+                                        {
+                                            sourceMapping.sourceUrl = destSeqPt.Document.Url;
+                                            sourcePts.Add(destSeqPt.StartLine);
+                                        }
+                                        else
+                                        {
+                                            destSeqPt = null;
+                                            stateSwitch = stateSwitch.Next;
+                                        }
+
+                                    } while (destSeqPt == null);
+
                                     continue;
                                 }
                                 //TODO: error if null
@@ -214,7 +216,7 @@ namespace aeric.coroutinery {
                         }
 
                         sourceMapping.stateSourcePoints = sourcePts.ToArray();
-                        debugAsset.AddSourceMapping(sourceMapping);
+                        assemblyDebugAsset.AddSourceMapping(sourceMapping);
                     }
                 }
                 //   }
@@ -226,6 +228,63 @@ namespace aeric.coroutinery {
                 Debug.Log($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
             }
 
+        }
+
+        private static CoroutineDebugInfo LoadCoroutineDebugAsset()
+        {
+            //Load the asset that contains the coroutine debug info
+            //Look at our default path
+            string defaultPath = "Assets/coroutinery/Debug/";
+            string filename = "coroutine_debug_info.asset";
+            string fullPath = defaultPath + filename;
+            CoroutineDebugInfo debugAsset = null;
+
+            {
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+
+                debugAsset = AssetDatabase.LoadAssetAtPath<CoroutineDebugInfo>(fullPath);
+                if (debugAsset == null)
+                {
+                    //Maybe it got moved?
+                    string[] debugAssets = AssetDatabase.FindAssets("t:CoroutineDebugInfo");
+                    if (debugAssets.Length == 0)
+                    {
+                        //No asset so lets create one
+                        debugAsset = ScriptableObject.CreateInstance<CoroutineDebugInfo>();
+                        AssetDatabase.CreateAsset(debugAsset, fullPath);
+                    }
+                    else
+                    {
+                        //If we have more than one just take the first one
+                        if (debugAssets.Length > 1)
+                        {
+                            Debug.LogWarning("Multiple CoroutineDebugInfo assets found:");
+                            foreach (var d in debugAssets)
+                            {
+                                Debug.LogWarning(d);
+                            }
+                        }
+
+                        fullPath = debugAssets[0];
+                        debugAsset = AssetDatabase.LoadAssetAtPath<CoroutineDebugInfo>(fullPath);
+                    }
+                }
+
+                if (debugAsset == null)
+                {
+                    //we failed to find or create the asset
+                    Debug.LogError("Failed to find or create CoroutineDebugInfo asset");
+                }
+
+                //clear out any existing data, we are going to recreate it entirely
+                //debugAsset.ClearData();
+
+                stopwatch.Stop();
+                Debug.Log($"Time loading debug asset: {stopwatch.ElapsedMilliseconds} ms");
+
+            }
+            return debugAsset;
         }
 
         private static void OnCompilationFinished(object obj)

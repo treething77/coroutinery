@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/coroutinery/Examples/Basic/Basic.unity
+    path: Assets/coroutinery/Examples/Emulation/Emulation.unity
     guid: 2584b83f194e70748bb33574bd27e883
+  - enabled: 1
+    path: Assets/coroutinery/Examples/Pause/Pause.unity
+    guid: 5970ae0609c52934f911d29df61b9a2f
+  - enabled: 1
+    path: Assets/coroutinery/Examples/LabelsContextTags/LabelsContextTags.unity
+    guid: ad474d5f0a782204caa25099188c454d
   m_configObjects: {}

@@ -12,7 +12,7 @@ namespace aeric.demos
 
         public bool testComplete;
 
-        public Dictionary<string, int> frameTimings = new();
+        public Dictionary<string, int> frameTimings = new Dictionary<string, int>();
 
         private bool movingUp = false;
         private bool movingDown = false;
@@ -32,7 +32,8 @@ namespace aeric.demos
         //All the code needed to convert from regular Unity coroutines to Coroutinery coroutines
         private new IEnumerator StartCoroutine(IEnumerator cocoForCoroutines)
         {
-            CoroutineManager.StartCoroutine(cocoForCoroutines);
+            var handle = CoroutineManager.StartCoroutine(cocoForCoroutines);
+            CoroutineManager.Instance.SetCoroutineContext(handle, this.gameObject);
             return cocoForCoroutines;
         }
 

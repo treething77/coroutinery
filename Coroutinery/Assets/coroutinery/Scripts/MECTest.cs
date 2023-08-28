@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using aeric.coroutinery;
-using MEC;
+//using MEC;
 using UnityEngine;
 
 public class MECTest : MonoBehaviour
@@ -9,16 +9,16 @@ public class MECTest : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Timing.RunCoroutine(_CheckForWin());
+    //    Timing.RunCoroutine(_CheckForWin());
     }
-    
+    /*
     IEnumerator<float> _CheckForWin()
     {
         
         while (counter < 3)
         {
             Debug.Log(counter);
-            yield return Timing.WaitUntilDone(_CheckForDone());
+     //       yield return Timing.WaitUntilDone(_CheckForDone());
         }
         
         Debug.Log("You win!");
@@ -30,7 +30,7 @@ public class MECTest : MonoBehaviour
         while (!done)
         {
             Debug.Log("Not done yet");
-            yield return Timing.WaitForSeconds(0.2f);
+       //     yield return Timing.WaitForSeconds(0.2f);
         }
         
         Debug.Log("Ok I'fffSdddfsfdfdfm done");
@@ -49,4 +49,5 @@ public class MECTest : MonoBehaviour
             done = true;
         }
     }
+    */
 }
