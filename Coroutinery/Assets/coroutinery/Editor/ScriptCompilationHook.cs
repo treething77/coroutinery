@@ -24,8 +24,48 @@ namespace aeric.coroutinery {
             CompilationPipeline.assemblyCompilationFinished += OnAssemblyCompilationFinished;
         }
 
+        [MenuItem("Coroutinery/Rebuild All")]
+        public static void RebuildAll()
+        {
+            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (Assembly assembly in assemblies)
+            {
+                  if (assembly.IsDynamic) continue;
+                if (assembly.FullName.Contains("Unity")) continue;
+                string assemblyPath = assembly.Location;
+                BuildAssemblySourceMapping(assemblyPath);
+            }
+
+        }
+
+        //add menu item to set auto build mappings
+        [MenuItem("Coroutinery/Auto build source mappings")]
+        public static void ToggleAutoBuildMappings()
+        {
+            bool autoBuildMappings = EditorPrefs.GetBool("Coroutinery/Auto build source mappings", true);
+            autoBuildMappings = !autoBuildMappings;
+            EditorPrefs.SetBool("Coroutinery/Auto build source mappings", autoBuildMappings);
+            Debug.Log($"Coroutinery: Auto build source mappings: {autoBuildMappings}");
+        }
+
+        //validate menu item
+        [MenuItem("Coroutinery/Auto build source mappings", true)]
+        public static bool ToggleAutoBuildMappingsValidate()
+        {
+            bool autoBuildMappings = EditorPrefs.GetBool("Coroutinery/Auto build source mappings", true);
+            Menu.SetChecked("Coroutinery/Auto build source mappings", autoBuildMappings);
+            return true;
+        }   
+
         private static void OnAssemblyCompilationFinished(string assemblyPath, CompilerMessage[] arg2)
-        { 
+        {
+            bool autoBuildMappings = EditorPrefs.GetBool("Coroutinery/Auto build source mappings", true);
+            if (autoBuildMappings)
+                BuildAssemblySourceMapping(assemblyPath);
+        }
+
+        private static void BuildAssemblySourceMapping(string assemblyPath)
+        {
             //  Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
             //foreach (var assembly in assemblies) {
@@ -45,12 +85,13 @@ namespace aeric.coroutinery {
 
                 //Use Cecil to load the assembly definition
                 AssemblyDefinition assemblyDef;
-                TypeCache.TypeCollection enumeratorTypes;
+                //TypeCache.TypeCollection enumeratorTypes;
                 IEnumerable<TypeDefinition> typeDefs;
-          
+                List<Type> enumeratorTypes = new List<Type>();
+
 
                 //Use System.Reflection to get the actual types
-            //    Assembly a;
+                //    Assembly a;
 
                 {
                     Stopwatch stopwatch2 = new Stopwatch();
@@ -66,160 +107,138 @@ namespace aeric.coroutinery {
                     stopwatch2 = new Stopwatch();
                     stopwatch2.Start();
 
-             //       a= System.Reflection.Assembly.LoadFrom(assemblyPath);
-                    enumeratorTypes = TypeCache.GetTypesDerivedFrom<IEnumerator>();
+                                   
+
+                    //enumeratorTypes = TypeCache.GetTypesDerivedFrom<IEnumerator>();
 
                     stopwatch2.Stop();
-                    Debug.Log($"Time loading types: {stopwatch2.ElapsedMilliseconds} ms foasdasdr {enumeratorTypes.Count}");
+                    Debug.Log($"Time loading types: {stopwatch2.ElapsedMilliseconds} ms {enumeratorTypes.Count}");
                     
                 }
 
                 var assemblyDebugAsset = debugAsset.GetAssemblySourceMapping(assemblyDef.Name.Name);
                 assemblyDebugAsset.ClearData();
 
-              //  Type[] types = a.GetTypes();
-
-             //   var generatedMethods = TypeCache.GetMethodsWithAttribute<CompilerGeneratedAttribute>();
-
-                foreach (var type in enumeratorTypes)
+                foreach (TypeDefinition typeDef in typeDefs)
                 {
-                //    if (!type.Assembly.Location.Contains("ScriptAssemblies")) continue;
-                  //  if (type.Assembly.FullName != assemblyDef.FullName) continue;
-                    
-                    if (type.GetCustomAttribute<CompilerGeneratedAttribute>() != null)
+                    if (!typeDef.HasCustomAttributes) continue;
+                    //does it have the CompilerGeneratedAttribute 
+                    bool isCompilerGenerated = typeDef.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.CompilerGeneratedAttribute");
+                    if (!isCompilerGenerated) continue;
+
+                    //does it have the IEnumerator interface
+                    bool isEnumerator = typeDef.Interfaces.Any(i => i.InterfaceType.FullName == "System.Collections.IEnumerator");
+                    if (!isEnumerator) continue;
+
+                    Debug.Log($" ----- compiler generated type: {typeDef.Name}");
+
+                    CoroutineSourceMapping sourceMapping = new CoroutineSourceMapping();
+                    sourceMapping.typeName = typeDef.Name;
+                    sourceMapping.typeNamespace = typeDef.DeclaringType.Namespace;
+
+                    List<int> sourcePts = new List<int>();
+                    typeDef.Resolve();
+
+
+                    //TODO: error if null
+
+                    //TODO: replace the loop with a find
+                    // dont error if we dont find it
+                    foreach (MethodDefinition m in typeDef.Methods)
                     {
-                        Debug.Log($" ----- compiler generated type: {type.Name}");
-
-                        CoroutineSourceMapping sourceMapping = new CoroutineSourceMapping();
-                        sourceMapping.typeName = type.Name;
-                        sourceMapping.typeNamespace = type.Namespace;
-
-                        List<int> sourcePts = new List<int>();
-                        //names don't match
-                        //one uses '/' as a split the other uses '+'
-
-                        Debug.Log($" ----- compiler generated type full name: {type.FullName}");
-
-                        string fixedClassName = type.FullName.Replace("+<", "/<");
-                        //   Debug.Log($"Coroutine class:   {fixedClassName}");
-
-                        TypeDefinition coroutineTypeDef = null;
-
-                        foreach(var t in typeDefs)
+                        if (m.Name.Contains("MoveNext"))
                         {
-                            if (t.FullName == fixedClassName)
+                            //Debug.Log("MoveNsdsdfext");
+                            Collection<Instruction> instructions = m.Body.Instructions;
+
+                            sourceMapping.sourceUrl = m.DebugInformation.SequencePoints[0].Document.Url;
+
+                            Instruction stateSwitch =
+                                instructions.FirstOrDefault(i => i.OpCode.Code == Code.Switch);
+                            if (stateSwitch == null)
                             {
-                                coroutineTypeDef = t;
-                                break;
-                            }
-                        }
-                        if (coroutineTypeDef == null)
-                        {
-                           // Debug.LogError($"Failed to find type definition for {fixedClassName}");
-                            continue;
-                        }
-                        
-                        //TODO: error if null
+                                //Simple coroutines might not have a switch on the current state
+                                //in that case we just use the first instruction after the yield return
 
-                        //TODO: replace the loop with a find
-                        // dont error if we dont find it
-                        foreach (MethodDefinition m in coroutineTypeDef.Methods)
-                        {
-                            if (m.Name.Contains("MoveNext"))
-                            {
-                                //Debug.Log("MoveNsdsdfext");
-                                Collection<Instruction> instructions = m.Body.Instructions;
-
-                                sourceMapping.sourceUrl = m.DebugInformation.SequencePoints[0].Document.Url;
-
-                                Instruction stateSwitch =
-                                    instructions.FirstOrDefault(i => i.OpCode.Code == Code.Switch);
-                                if (stateSwitch == null)
+                                foreach(var instr in instructions)
                                 {
-                                    //Simple coroutines might not have a switch on the current state
-                                    //in that case we just use the first instruction after the yield return
+                                //     Debug.Log(instr);
+                                }
 
-                                    foreach(var instr in instructions)
+                                stateSwitch = instructions.FirstOrDefault(i =>
+                                                                        i.OpCode.Code == Code.Ldc_I4_1 && i.Next != null &&
+                                                                                                                i.Next.OpCode.Code == Code.Ret);
+                                if (stateSwitch == null)
+                                    continue;
+
+                                SequencePoint destSeqPt = null;
+
+                                do
+                                {
+                                    destSeqPt = m.DebugInformation.GetSequencePoint(stateSwitch);
+                                    //TODO: temp constant to skip invalid lines
+                                    if (destSeqPt != null && destSeqPt.StartLine < 100000)
                                     {
-                                   //     Debug.Log(instr);
+                                        sourceMapping.sourceUrl = destSeqPt.Document.Url;
+                                        sourcePts.Add(destSeqPt.StartLine);
+                                    }
+                                    else
+                                    {
+                                        destSeqPt = null;
+                                        stateSwitch = stateSwitch.Next;
                                     }
 
-                                    stateSwitch = instructions.FirstOrDefault(i =>
-                                                                           i.OpCode.Code == Code.Ldc_I4_1 && i.Next != null &&
-                                                                                                                  i.Next.OpCode.Code == Code.Ret);
-                                    if (stateSwitch == null)
-                                        continue;
+                                } while (destSeqPt == null);
 
-                                    SequencePoint destSeqPt = null;
+                                continue;
+                            }
+                            //TODO: error if null
 
-                                    do
-                                    {
-                                        destSeqPt = m.DebugInformation.GetSequencePoint(stateSwitch);
-                                        //TODO: temp constant to skip invalid lines
-                                        if (destSeqPt != null && destSeqPt.StartLine < 100000)
-                                        {
-                                            sourceMapping.sourceUrl = destSeqPt.Document.Url;
-                                            sourcePts.Add(destSeqPt.StartLine);
-                                        }
-                                        else
-                                        {
-                                            destSeqPt = null;
-                                            stateSwitch = stateSwitch.Next;
-                                        }
+                            // Debug.Log($"State switch at {stateSwitch.Offset}");
 
-                                    } while (destSeqPt == null);
+                            //for each state jump instruction, get first instruction after that with value 
+                            //sequence point with a valid start line
+                            Instruction[] jumpInstructions = (Instruction[])stateSwitch.Operand;
 
-                                    continue;
-                                }
-                                //TODO: error if null
+                            foreach (var jumpInstr in jumpInstructions)
+                            {
 
-                                // Debug.Log($"State switch at {stateSwitch.Offset}");
+                                //where are we jumping to?
+                                Instruction destInstr = (Instruction)jumpInstr.Operand;
+                                if (destInstr == null) continue;
 
-                                //for each state jump instruction, get first instruction after that with value 
-                                //sequence point with a valid start line
-                                Instruction[] jumpInstructions = (Instruction[])stateSwitch.Operand;
-
-                                foreach (var jumpInstr in jumpInstructions)
+                                SequencePoint destSeqPt = null;
+                                do
                                 {
-
-                                    //where are we jumping to?
-                                    Instruction destInstr = (Instruction)jumpInstr.Operand;
-                                    if (destInstr == null) continue;
-
-                                    SequencePoint destSeqPt = null;
-                                    do
+                                    destSeqPt = m.DebugInformation.GetSequencePoint(destInstr);
+                                    //TODO: temp constant to skip invalid lines
+                                    if (destSeqPt != null && destSeqPt.StartLine < 100000)
                                     {
-                                        destSeqPt = m.DebugInformation.GetSequencePoint(destInstr);
-                                        //TODO: temp constant to skip invalid lines
-                                        if (destSeqPt != null && destSeqPt.StartLine < 100000)
-                                        {
 
-                                            // Debug.Log(destSeqPt.Document.Url);
-                                            //   Debug.Log(destSeqPt.StartLine);
+                                        // Debug.Log(destSeqPt.Document.Url);
+                                        //   Debug.Log(destSeqPt.StartLine);
 
-                                            //TODO: dont want the full path, just relative to project
+                                        //TODO: dont want the full path, just relative to project
 
-                                            //TODO: If we have a URL from the sequence point then override the one we have because this will be more accurate
-                                            sourceMapping.sourceUrl = destSeqPt.Document.Url;
+                                        //TODO: If we have a URL from the sequence point then override the one we have because this will be more accurate
+                                        sourceMapping.sourceUrl = destSeqPt.Document.Url;
 
-                                            sourcePts.Add(destSeqPt.StartLine);
-                                        }
-                                        else
-                                        {
-                                            destSeqPt = null;
-                                            destInstr = destInstr.Next;
-                                        }
+                                        sourcePts.Add(destSeqPt.StartLine);
+                                    }
+                                    else
+                                    {
+                                        destSeqPt = null;
+                                        destInstr = destInstr.Next;
+                                    }
 
-                                    } while (destSeqPt == null);
-                                }
+                                } while (destSeqPt == null);
                             }
                         }
-
-                        sourceMapping.stateSourcePoints = sourcePts.ToArray();
-                        assemblyDebugAsset.AddSourceMapping(sourceMapping);
                     }
+
+                    sourceMapping.stateSourcePoints = sourcePts.ToArray();
+                    assemblyDebugAsset.AddSourceMapping(sourceMapping);
                 }
-                //   }
 
                 EditorUtility.SetDirty(debugAsset);
 

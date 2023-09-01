@@ -857,7 +857,7 @@ namespace aeric.coroutinery
 
             SourceInfo coroutineDebug = GetCoroutineDebugInfo(coroutine, debugInfo);
 
-            //extract the method name from the enumerator type name
+            //extract the method name from the enumerator type name  
             string methodName = string.Empty;
             if (debugInfo != null)
             {

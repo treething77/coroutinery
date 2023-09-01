@@ -308,22 +308,7 @@ namespace aeric.coroutinery
             if (c.Current != null)
             {
                 EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
-                if (c.Current is IEnumerator)
-                {
-                    //get the pretty name for the coroutine we are waiting on
-                    IEnumerator current = c.Current as IEnumerator;
-                    var currentHandle = CoroutineManager.Instance.GetCoroutineHandle(c.Current as IEnumerator);
-                    string prettyName = CoroutineManager.Instance.GetCoroutinePrettyName(currentHandle, _debugInfo);
-
-                    //this is a coroutine so add a button to jump to it
-                    if (GUILayout.Button(prettyName))
-                    {
-                        
-                        //might not be in our current filter view
-                                                                        
-                    }
-                }
-                else if (c.Current is WaitForSeconds)
+                if (c.Current is WaitForSeconds)
                 {
                     WaitForSeconds wait = c.Current as WaitForSeconds;
                     
@@ -338,6 +323,29 @@ namespace aeric.coroutinery
                 else if (c.Current is WaitForFrames)
                 {
 
+                }
+                else if (c.Current is WaitWhile)
+                {
+
+                }
+                else if (c.Current is WaitUntil)
+                {
+
+                }
+                else if (c.Current is IEnumerator)
+                {
+                    //get the pretty name for the coroutine we are waiting on
+                    IEnumerator current = c.Current as IEnumerator;
+                    var currentHandle = CoroutineManager.Instance.GetCoroutineHandle(c.Current as IEnumerator);
+                    string prettyName = CoroutineManager.Instance.GetCoroutinePrettyName(currentHandle, _debugInfo);
+
+                    //this is a coroutine so add a button to jump to it
+                    if (GUILayout.Button(prettyName))
+                    {
+
+                        //might not be in our current filter view
+
+                    }
                 }
             }
             
