@@ -34,9 +34,13 @@ namespace aeric.coroutinery
             //Show existing window instance. If one doesn't exist, make one.
 
             CoroutineDebugWindow wnd = GetWindow<CoroutineDebugWindow>();
-            wnd.titleContent = new GUIContent("Coroutines");
+
+            Texture2D stackPtrIcon = EditorResources.Load<Texture2D>("Assets/coroutinery/Editor/Resources/stack_ptr.png");
+
+            wnd.titleContent = new GUIContent("Coroutine Debugger", stackPtrIcon);
             wnd.wantsLessLayoutEvents = false;
             wnd.wantsMouseMove = true;
+
 
         }
 
@@ -179,7 +183,7 @@ namespace aeric.coroutinery
                                     name = CoroutineManager.Instance.GetCoroutinePrettyName(coroutine, _debugInfo);
 
                                     //highlight the selected coroutine
-                                    if (coroutineIndex == coroutines.IndexOf(coroutine))
+                                    if (selectedCoroutine._id == coroutine._id)
                                     {
                                         EditorGUILayout.LabelField(name, currentStyle);
                                     }
@@ -266,8 +270,6 @@ namespace aeric.coroutinery
 
             if (selectedCoroutine._id != 0)
             {
-
-
                 GUILayout.BeginArea(new Rect(xStart, yStart, debugInfoAreaWidth, stackAreaHeight), new GUIContent(tex));
                     dividorRect = EditorGUILayout.GetControlRect(GUILayout.Height(separatorWidth + 4));
 
@@ -287,12 +289,19 @@ namespace aeric.coroutinery
                             if (i>0)
                                 GUILayout.Label(stackPtrIcon, GUILayout.Width(20), GUILayout.Height(20));
 
-                                string prettyName = CoroutineManager.Instance.GetCoroutinePrettyName(handle, _debugInfo);   
-                                if (GUILayout.Button(prettyName))
-                                {
-                                    selectedCoroutine = handle;
-                                    Repaint();
-                                }
+                            string prettyName = CoroutineManager.Instance.GetCoroutinePrettyName(handle, _debugInfo);
+
+                            GUIStyle style = new GUIStyle(GUI.skin.button);
+                            var t = style.normal.background;
+                            Texture2D selectedBG = EditorResources.Load<Texture2D>("Assets/coroutinery/Editor/Resources/selected.png");
+
+                            style.normal.background = handle._id == selectedCoroutine._id ? selectedBG : t;
+
+                            if (GUILayout.Button(prettyName, style))
+                            {
+                                selectedCoroutine = handle;
+                                Repaint();
+                            }
              
                             EditorGUILayout.EndHorizontal();
 
@@ -303,6 +312,16 @@ namespace aeric.coroutinery
                 GUILayout.EndArea();
             }
 
+            Texture2D helpIcon = EditorResources.Load<Texture2D>("Assets/coroutinery/Editor/Resources/help.png");
+            GUIStyle style2 = new GUIStyle(GUI.skin.button);
+            style2.margin = new RectOffset(0, 0, 0, 0);
+            style2.padding = new RectOffset(0, 0, 0, 0);
+
+            if (GUI.Button(new Rect(windowWidth - 20, 0, 16, 16), helpIcon, style2))
+            {
+                //open url to the documentation
+                Application.OpenURL("http://aeric.games/rwnd/api/html/index.html");
+            }
             //call ongui again on a timer
             //  Repaint();
         }
@@ -454,7 +473,8 @@ namespace aeric.coroutinery
                 }
             }
 
-            EditorGUILayout.TextArea(debugInfo.url + ":" + debugInfo.lineNumber);
+            EditorGUILayout.TextArea(debugInfo.enumeratorTypeName + ".MoveNext (" + debugInfo.url + ":" + debugInfo.lineNumber + ")");
+
             EditorGUILayout.EndVertical();
 
 
