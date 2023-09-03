@@ -134,6 +134,7 @@ namespace aeric.coroutinery {
 
                     CoroutineSourceMapping sourceMapping = new CoroutineSourceMapping();
                     sourceMapping.typeName = typeDef.Name;
+                    sourceMapping.outerTypeName = typeDef.DeclaringType.Name;
                     sourceMapping.typeNamespace = typeDef.DeclaringType.Namespace;
 
                     List<int> sourcePts = new List<int>();
@@ -148,7 +149,6 @@ namespace aeric.coroutinery {
                     {
                         if (m.Name.Contains("MoveNext"))
                         {
-                            //Debug.Log("MoveNsdsdfext");
                             Collection<Instruction> instructions = m.Body.Instructions;
 
                             string fullUrl = m.DebugInformation.SequencePoints[0].Document.Url;

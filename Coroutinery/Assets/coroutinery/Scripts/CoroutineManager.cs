@@ -36,8 +36,11 @@ namespace aeric.coroutinery
     // This struct is used to keep track of coroutines. It is used to identify coroutines but does not store any state.
     public struct CoroutineHandle
     {
+        public static readonly CoroutineHandle InvalidHandle = new CoroutineHandle(0);
+
         //uuid - 64 bit
         public readonly ulong _id;
+        public bool IsValid => _id != InvalidHandle._id;
 
         public CoroutineHandle(ulong id)
         {
@@ -936,7 +939,7 @@ namespace aeric.coroutinery
                     return wt.subcoroutine;
                 }
             }
-            return new CoroutineHandle(0);
+            return CoroutineHandle.InvalidHandle;
         }
 
         private CoroutineHandle GetCoroutineParent(CoroutineHandle currentHandle)
@@ -949,7 +952,7 @@ namespace aeric.coroutinery
                     return wt.handle;
                 }
             }
-            return new CoroutineHandle(0);
+            return CoroutineHandle.InvalidHandle;
         }
     }
 }

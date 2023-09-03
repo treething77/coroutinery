@@ -13,6 +13,7 @@ namespace aeric.coroutinery {
         public string typeNamespace;
 
         public int[] stateSourcePoints;
+        public string outerTypeName;
     }
 
     public class SourceInfo
@@ -20,6 +21,7 @@ namespace aeric.coroutinery {
         public string url;
         public int lineNumber;
         public string enumeratorTypeName;
+        public string outerTypeName;
     }
 
     //TODO: move to own file
@@ -66,6 +68,7 @@ namespace aeric.coroutinery {
             sourceInfo.url = typeMapping.sourceUrl;
             sourceInfo.lineNumber = sourcePoint;
             sourceInfo.enumeratorTypeName = type.Name;
+            sourceInfo.outerTypeName = typeMapping.outerTypeName;
 
             return sourceInfo; 
         }
