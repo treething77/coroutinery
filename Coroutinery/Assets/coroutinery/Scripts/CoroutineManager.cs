@@ -128,6 +128,8 @@ namespace aeric.coroutinery
 
         public static CoroutineManager Instance => _manager;
 
+        public bool BreakOnFinished { get; set; }
+
         private CoroutineUpdater _updater;
 
         //This is used to emulate an oddity of the Unity behavior where a coroutine that yields in the fixed update does not
@@ -167,8 +169,8 @@ namespace aeric.coroutinery
 
         struct WaitCoroutine
         {
-            public CoroutineHandle subcoroutine;
-            public CoroutineHandle handle;
+            public CoroutineHandle subcoroutine;//coroutine that we are waiting on
+            public CoroutineHandle handle;//coroutine that is waiting
         }
 
         private List<WaitCoroutine> _waitCoroutines = new List<WaitCoroutine>();
@@ -426,6 +428,12 @@ namespace aeric.coroutinery
             {
                 callback?.Invoke();
                 _finishedCallbacks.Remove(handle);
+            }
+
+            if (BreakOnFinished)
+            {
+                Debug.Log("Coroutine Finished: " + co.ToString());
+                Debug.Break();
             }
 
             //check for any coroutines waiting on this one. Remove them from the wait list and
@@ -819,14 +827,14 @@ namespace aeric.coroutinery
 
         public SourceInfo GetCoroutineDebugInfo(CoroutineHandle coroutineHandle, CoroutineDebugInfo d)
         {
-            string debugInfo = string.Empty;
+          //  string debugInfo = string.Empty;
 
             IEnumerator c = _enumeratorLookup[coroutineHandle];
             Type typ = c.GetType();
             FieldInfo type = typ.GetField("<>1__state", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             int stateValue = (int)type.GetValue(c);
 
-            debugInfo += "State: " + stateValue + "\n";
+         //   debugInfo += "State: " + stateValue + "\n";
 
 
             return d.GetSourceInfo(c, stateValue);
@@ -887,6 +895,61 @@ namespace aeric.coroutinery
 
             //TODO: error
             return 0.0f;
+        }
+
+        public List<CoroutineHandle> GetCoroutineStack(CoroutineHandle coroutineHandle)
+        {
+            List<CoroutineHandle > stack = new List<CoroutineHandle>();
+
+            //first get to the root coroutine and then walk down the stack
+            CoroutineHandle rootCoroutine = coroutineHandle;
+            while (true)
+            {
+                CoroutineHandle parentHandle = GetCoroutineParent(rootCoroutine);
+                if (parentHandle._id == 0)
+                {
+                    break;
+                }
+                rootCoroutine = parentHandle;
+            }
+
+            //Then starting at the root coroutine walk down the stack checking if there is
+            //a coroutine waiting on it
+            CoroutineHandle currentHandle = rootCoroutine;
+
+            while (currentHandle._id != 0)
+            {
+                stack.Add(currentHandle);
+                currentHandle = GetCoroutineChild(currentHandle);
+            }
+
+            return stack;
+        }
+
+        private CoroutineHandle GetCoroutineChild(CoroutineHandle currentHandle)
+        {
+            //check if there is a coroutine we are waiting on
+            foreach (WaitCoroutine wt in _waitCoroutines)
+            {
+                if (wt.handle._id == currentHandle._id)
+                {
+                    return wt.subcoroutine;
+                }
+            }
+            return new CoroutineHandle(0);
+        }
+
+        private CoroutineHandle GetCoroutineParent(CoroutineHandle currentHandle)
+        {
+            //check if there is a coroutine waiting on this one
+            foreach (WaitCoroutine wt in _waitCoroutines)
+            {
+                if (wt.subcoroutine._id == currentHandle._id)
+                {
+                    return wt.handle;
+                }
+            }
+            return new CoroutineHandle(0);
         }
     }
 }

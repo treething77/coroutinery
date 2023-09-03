@@ -15,35 +15,35 @@ MonoBehaviour:
   assemblyMappings:
   - assemblyName: Assembly-CSharp
     sourceMapping:
-    - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\coroutinery\Scripts\CoroutineManager.cs
+    - sourceUrl: Assets\coroutinery\Scripts\CoroutineManager.cs
       typeName: <EndOfFrameRunner>d__2
       typeNamespace: aeric.coroutinery
       stateSourcePoints: 61000000
-    - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\coroutinery\Examples\Emulation\UnityEmulationTest.cs
+    - sourceUrl: Assets\coroutinery\Examples\Emulation\UnityEmulationTest.cs
       typeName: <NestedTest>d__9
       typeNamespace: aeric.demos
       stateSourcePoints: 3300000037000000390000003b0000003e00000043000000450000004a0000004c00000051000000
-    - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\coroutinery\Examples\Emulation\UnityEmulationTest.cs
+    - sourceUrl: Assets\coroutinery\Examples\Emulation\UnityEmulationTest.cs
       typeName: <BreakTest>d__10
       typeNamespace: aeric.demos
       stateSourcePoints: 
-    - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\coroutinery\Examples\Emulation\UnityEmulationTest.cs
+    - sourceUrl: Assets\coroutinery\Examples\Emulation\UnityEmulationTest.cs
       typeName: <SpinIt>d__11
       typeNamespace: aeric.demos
       stateSourcePoints: 5e00000063000000690000007200000080000000
-    - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\coroutinery\Examples\Emulation\UnityEmulationTest.cs
+    - sourceUrl: Assets\coroutinery\Examples\Emulation\UnityEmulationTest.cs
       typeName: <MoveIt>d__12
       typeNamespace: aeric.demos
       stateSourcePoints: 860000008b0000008e00000093000000
-    - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\coroutinery\Examples\LabelsContextTags\TagLayerSetup.cs
+    - sourceUrl: Assets\coroutinery\Examples\LabelsContextTags\TagLayerSetup.cs
       typeName: <SpinIt>d__6
       typeNamespace: aeric.demos
       stateSourcePoints: 56000000
-    - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\coroutinery\Examples\LabelsContextTags\TagLayerSetup.cs
+    - sourceUrl: Assets\coroutinery\Examples\LabelsContextTags\TagLayerSetup.cs
       typeName: <MoveIt>d__7
       typeNamespace: aeric.demos
       stateSourcePoints: 5b000000680000006b000000
-    - sourceUrl: C:\personal\coroutinery\Coroutinery\Assets\coroutinery\Examples\Pause\PauseTest.cs
+    - sourceUrl: Assets\coroutinery\Examples\Pause\PauseTest.cs
       typeName: <MoveIt>d__4
       typeNamespace: aeric.demos
       stateSourcePoints: 2e000000

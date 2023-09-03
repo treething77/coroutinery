@@ -151,8 +151,10 @@ namespace aeric.coroutinery {
                             //Debug.Log("MoveNsdsdfext");
                             Collection<Instruction> instructions = m.Body.Instructions;
 
-                            sourceMapping.sourceUrl = m.DebugInformation.SequencePoints[0].Document.Url;
-
+                            string fullUrl = m.DebugInformation.SequencePoints[0].Document.Url;
+                            string url = fullUrl.Substring(fullUrl.IndexOf("Assets"));
+                            sourceMapping.sourceUrl = url;
+                            
                             Instruction stateSwitch =
                                 instructions.FirstOrDefault(i => i.OpCode.Code == Code.Switch);
                             if (stateSwitch == null)
@@ -179,7 +181,8 @@ namespace aeric.coroutinery {
                                     //TODO: temp constant to skip invalid lines
                                     if (destSeqPt != null && destSeqPt.StartLine < 100000)
                                     {
-                                        sourceMapping.sourceUrl = destSeqPt.Document.Url;
+                                        fullUrl = destSeqPt.Document.Url;
+                                        sourceMapping.sourceUrl = fullUrl.Substring(fullUrl.IndexOf("Assets"));
                                         sourcePts.Add(destSeqPt.StartLine);
                                     }
                                     else
@@ -221,7 +224,9 @@ namespace aeric.coroutinery {
                                         //TODO: dont want the full path, just relative to project
 
                                         //TODO: If we have a URL from the sequence point then override the one we have because this will be more accurate
-                                        sourceMapping.sourceUrl = destSeqPt.Document.Url;
+
+                                        fullUrl = destSeqPt.Document.Url;
+                                        sourceMapping.sourceUrl = fullUrl.Substring(fullUrl.IndexOf("Assets"));
 
                                         sourcePts.Add(destSeqPt.StartLine);
                                     }
