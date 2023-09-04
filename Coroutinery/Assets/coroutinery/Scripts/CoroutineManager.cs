@@ -129,15 +129,27 @@ namespace aeric.coroutinery
 
         private static CoroutineManager _manager;
 
-        public static CoroutineManager Instance => _manager;
+        public static CoroutineManager Instance
+        {
+            get
+            {
+                if (_manager == null)
+                {
+                    CreateManager();
+                    _manager.Initialize();
+                }
+                return _manager;
+            }
+        }
 
         public bool BreakOnFinished { get; set; }
+        public bool LogSteps { get; set; }
 
         private CoroutineUpdater _updater;
 
         //This is used to emulate an oddity of the Unity behavior where a coroutine that yields in the fixed update does not
         //run again on the same frame even though it seems like it should since Update runs after FixedUpdate
-        //so we introduce an artificial delay of one frame for coroutines that yield in the fixed update
+        //so we introduce an artificial delay of one frame for coroutines that yield in the fixed update 
         private List<CoroutineHandle> _pendingList = new List<CoroutineHandle>();
 
 
@@ -472,7 +484,7 @@ namespace aeric.coroutinery
         {
             if (coroutine == null)
             {
-                //TODO: error
+                //TODO: ddderror
                 return default(CoroutineHandle);
             }
 

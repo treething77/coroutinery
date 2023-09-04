@@ -108,6 +108,8 @@ namespace aeric.coroutinery
 
 
         bool breakOnFinished = false;
+        bool logSteps = false;
+
         private CoroutineHandle selectedCoroutine = CoroutineHandle.InvalidHandle;
 
         void OnGUI()
@@ -151,6 +153,8 @@ namespace aeric.coroutinery
                 //get the coroutine stack
                 stackHandles = CoroutineManager.Instance.GetCoroutineStack(selectedCoroutine);
             }
+
+            //TODO: this isnt right, 30 was just a guess, and we aren't accounting for the label height
             stackAreaHeight = (30 * stackHandles.Count) + (separatorWidth + 4) + 2;
 
             float xStart = leftPaneWidth + separatorWidth;
@@ -223,8 +227,7 @@ namespace aeric.coroutinery
 
                                 if (GUILayout.Button(prettyName, style))
                                 {
-                                    selectedCoroutine = handle;
-                                    Repaint();
+                                    SetSelectedCoroutine(handle);
                                 }
 
                             }//end horizontal scope
@@ -328,8 +331,7 @@ namespace aeric.coroutinery
                                         coroutineIndex = (int)(mousePosRelative.y / 20);
                                         if (coroutineIndex >= 0 && coroutineIndex < coroutines.Count)
                                         {
-                                            selectedCoroutine = coroutines[coroutineIndex];
-                                            Repaint();
+                                            SetSelectedCoroutine(coroutines[coroutineIndex]);
                                         }
                                     }
                                 }
@@ -370,11 +372,26 @@ namespace aeric.coroutinery
                         if (CoroutineManager.Instance != null)
                             CoroutineManager.Instance.BreakOnFinished = breakOnFinished;
 
-                        breakOnFinished = EditorGUILayout.Toggle("Log Steps", breakOnFinished);//TODO: string
+                        logSteps = EditorGUILayout.Toggle("Log Steps", logSteps);//TODO: string
+                        if (CoroutineManager.Instance != null)
+                            CoroutineManager.Instance.LogSteps = logSteps;
 
                     }//end vertical scope
                 }//end area scope
             }//end horizontal scope      
+        }
+
+        private void SetSelectedCoroutine(CoroutineHandle coroutineHandle)
+        {
+            selectedCoroutine = coroutineHandle;
+            Repaint();
+
+            var context = CoroutineManager.Instance.GetCoroutineContext(coroutineHandle);
+            if (context is GameObject)
+            {
+                //highlight the GameObject
+                Selection.activeGameObject = (GameObject)context;
+            }
         }
 
         private Texture2D MakeTex(int width, int height, Color col)
@@ -503,8 +520,7 @@ namespace aeric.coroutinery
                             //this is a coroutine so add a button to jump to it
                             if (GUILayout.Button(prettyName))
                             {
-                                selectedCoroutine = currentHandle;
-                                Repaint();
+                                SetSelectedCoroutine(currentHandle);
                             }
                         }//end horizontal scope
                     }
