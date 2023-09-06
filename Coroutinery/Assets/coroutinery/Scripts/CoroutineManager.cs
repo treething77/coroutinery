@@ -211,15 +211,15 @@ namespace aeric.coroutinery
         //TODO: move static methods into own static class, purely for API?
         public static void RunCoroutines()
         {
-            _manager.Run(RunPhase.Update);
+            Instance.Run(RunPhase.Update);
 
             //handle wait timers
-            _manager.RunWaitTimers();
+            Instance.RunWaitTimers();
 
             //handle frame timers
-            _manager.RunCustomYields();
+            Instance.RunCustomYields();
 
-            _manager.RunPending();
+            Instance.RunPending();
 
         }
 
@@ -484,21 +484,12 @@ namespace aeric.coroutinery
         {
             if (coroutine == null)
             {
-                //TODO: ddderror
-                return default(CoroutineHandle);
+                return CoroutineHandle.InvalidHandle;
             }
 
-            if (_manager == null)
-            {
-                CreateManager();
-                _manager.Initialize();
-            }
-
-            //TODO: push coroutine handle onto list rather than enumerator
-            return _manager.Start(coroutine);
+            return Instance.Start(coroutine);
 
             //TODO: did it immediately end?
-
         }
 
         public string GetStackTrace(CoroutineHandle handle)
@@ -825,6 +816,7 @@ namespace aeric.coroutinery
         {
             if (_updater == null)
             {
+                //TODO: only in play mode?
                 //TODO: yuck
                 GameObject instanceHome = GameObject.Find("CoroutineUpdater");
 
@@ -846,7 +838,7 @@ namespace aeric.coroutinery
 
             IEnumerator c = _enumeratorLookup[coroutineHandle];
             Type typ = c.GetType();
-            FieldInfo type = typ.GetField("<>1__state", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            FieldInfo type = typ.GetField("<>1__state", BindingFlags.NonPublic | BindingFlags.Instance);
             int stateValue = (int)type.GetValue(c);
 
          //   debugInfo += "State: " + stateValue + "\n";

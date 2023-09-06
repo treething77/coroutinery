@@ -155,7 +155,7 @@ namespace aeric.coroutinery
             }
 
             //TODO: this isnt right, 30 was just a guess, and we aren't accounting for the label height
-            stackAreaHeight = (30 * stackHandles.Count) + (separatorWidth + 4) + 2;
+            stackAreaHeight = (20 * stackHandles.Count) + (separatorWidth + 4) + 2 + 24;
 
             float xStart = leftPaneWidth + separatorWidth;
             float yStart = windowHeight - stackAreaHeight;

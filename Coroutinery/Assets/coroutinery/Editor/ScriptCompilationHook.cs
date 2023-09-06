@@ -1,11 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
@@ -15,27 +11,29 @@ using UnityEngine;
 using Assembly = System.Reflection.Assembly;
 using Debug = UnityEngine.Debug;
 
-namespace aeric.coroutinery {
-
+namespace aeric.coroutinery
+{
+    /// <summary>
+    /// Hooks into script compilation to build source mappings for coroutines
+    /// </summary>
     [InitializeOnLoad]
-    public class ScriptCompilationHook : UnityEditor.AssetModificationProcessor {
+    public class ScriptCompilationHook
+    {
         static ScriptCompilationHook() {
             CompilationPipeline.compilationFinished += OnCompilationFinished;
             CompilationPipeline.assemblyCompilationFinished += OnAssemblyCompilationFinished;
         }
 
-        [MenuItem("Coroutinery/Rebuild All")]
+        [MenuItem("Coroutinery/Rebuild Source Mappings")]
         public static void RebuildAll()
         {
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (Assembly assembly in assemblies)
             {
-                  if (assembly.IsDynamic) continue;
-                if (assembly.FullName.Contains("Unity")) continue;
-                string assemblyPath = assembly.Location;
-                BuildAssemblySourceMapping(assemblyPath);
+                if (assembly.IsDynamic) continue;
+                //This method will filter out all assemblies that are not user script assemblies
+                BuildAssemblySourceMapping(assembly.Location);
             }
-
         }
 
         //add menu item to set auto build mappings
@@ -61,197 +59,148 @@ namespace aeric.coroutinery {
         {
             bool autoBuildMappings = EditorPrefs.GetBool("Coroutinery/Auto build source mappings", true);
             if (autoBuildMappings)
+            {
                 BuildAssemblySourceMapping(assemblyPath);
+            }
+        }
+
+        private static bool IsUserScriptAssembly(string assemblyPath)
+        {
+            if (!assemblyPath.Contains("ScriptAssemblies")) return false;
+            if (assemblyPath.Contains("Unity")) return false;
+            return true;
         }
 
         private static void BuildAssemblySourceMapping(string assemblyPath)
         {
-            //  Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-
-            //foreach (var assembly in assemblies) {
-            bool processAssembly = assemblyPath.Contains("ScriptAssemblies");
-            
-            // if (assembly.IsDynamic) continue;
-            if (assemblyPath.Contains("Unity")) processAssembly = false;
-
-            if (processAssembly)
+            if (!IsUserScriptAssembly(assemblyPath)) return;
+                        
+            CoroutineDebugInfo debugInfoAsset = LoadCoroutineDebugAsset();
+            if (debugInfoAsset == null)
             {
-                CoroutineDebugInfo debugAsset = LoadCoroutineDebugAsset();
-
-                Debug.Log($"Scanning assembly: {assemblyPath}");
-
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                //Use Cecil to load the assembly definition
-                AssemblyDefinition assemblyDef;
-                //TypeCache.TypeCollection enumeratorTypes;
-                IEnumerable<TypeDefinition> typeDefs;
-                List<Type> enumeratorTypes = new List<Type>();
-
-
-                //Use System.Reflection to get the actual types
-                //    Assembly a;
-
-                {
-                    Stopwatch stopwatch2 = new Stopwatch();
-                    stopwatch2.Start();
-                    
-                    assemblyDef =
-                        AssemblyDefinition.ReadAssembly(assemblyPath, new ReaderParameters { ReadSymbols = true, ReadWrite = false});
-                    typeDefs = assemblyDef.MainModule.GetTypes();
-                    
-                    stopwatch2.Stop();
-                    Debug.Log($"Time loading type defs: {stopwatch2.ElapsedMilliseconds} ms");
-                    
-                    stopwatch2 = new Stopwatch();
-                    stopwatch2.Start();
-
-                                   
-
-                    //enumeratorTypes = TypeCache.GetTypesDerivedFrom<IEnumerator>();
-
-                    stopwatch2.Stop();
-                    Debug.Log($"Time loading types: {stopwatch2.ElapsedMilliseconds} ms {enumeratorTypes.Count}");
-                    
-                }
-
-                var assemblyDebugAsset = debugAsset.GetAssemblySourceMapping(assemblyDef.Name.Name);
-                assemblyDebugAsset.ClearData();
-
-                foreach (TypeDefinition typeDef in typeDefs)
-                {
-                    if (!typeDef.HasCustomAttributes) continue;
-                    //does it have the CompilerGeneratedAttribute 
-                    bool isCompilerGenerated = typeDef.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.CompilerGeneratedAttribute");
-                    if (!isCompilerGenerated) continue;
-
-                    //does it have the IEnumerator interface
-                    bool isEnumerator = typeDef.Interfaces.Any(i => i.InterfaceType.FullName == "System.Collections.IEnumerator");
-                    if (!isEnumerator) continue;
-
-                    Debug.Log($" ----- compiler generated type: {typeDef.Name}");
-
-                    CoroutineSourceMapping sourceMapping = new CoroutineSourceMapping();
-                    sourceMapping.typeName = typeDef.Name;
-                    sourceMapping.outerTypeName = typeDef.DeclaringType.Name;
-                    sourceMapping.typeNamespace = typeDef.DeclaringType.Namespace;
-
-                    List<int> sourcePts = new List<int>();
-                    typeDef.Resolve();
-
-
-                    //TODO: error if null
-
-                    //TODO: replace the loop with a find
-                    // dont error if we dont find it
-                    foreach (MethodDefinition m in typeDef.Methods)
-                    {
-                        if (m.Name.Contains("MoveNext"))
-                        {
-                            Collection<Instruction> instructions = m.Body.Instructions;
-
-                            string fullUrl = m.DebugInformation.SequencePoints[0].Document.Url;
-                            string url = fullUrl.Substring(fullUrl.IndexOf("Assets"));
-                            sourceMapping.sourceUrl = url;
-                            
-                            Instruction stateSwitch =
-                                instructions.FirstOrDefault(i => i.OpCode.Code == Code.Switch);
-                            if (stateSwitch == null)
-                            {
-                                //Simple coroutines might not have a switch on the current state
-                                //in that case we just use the first instruction after the yield return
-
-                                foreach(var instr in instructions)
-                                {
-                                //     Debug.Log(instr);
-                                }
-
-                                stateSwitch = instructions.FirstOrDefault(i =>
-                                                                        i.OpCode.Code == Code.Ldc_I4_1 && i.Next != null &&
-                                                                                                                i.Next.OpCode.Code == Code.Ret);
-                                if (stateSwitch == null)
-                                    continue;
-
-                                SequencePoint destSeqPt = null;
-
-                                do
-                                {
-                                    destSeqPt = m.DebugInformation.GetSequencePoint(stateSwitch);
-                                    //TODO: temp constant to skip invalid lines
-                                    if (destSeqPt != null && destSeqPt.StartLine < 100000)
-                                    {
-                                        fullUrl = destSeqPt.Document.Url;
-                                        sourceMapping.sourceUrl = fullUrl.Substring(fullUrl.IndexOf("Assets"));
-                                        sourcePts.Add(destSeqPt.StartLine);
-                                    }
-                                    else
-                                    {
-                                        destSeqPt = null;
-                                        stateSwitch = stateSwitch.Next;
-                                    }
-
-                                } while (destSeqPt == null);
-
-                                continue;
-                            }
-                            //TODO: error if null
-
-                            // Debug.Log($"State switch at {stateSwitch.Offset}");
-
-                            //for each state jump instruction, get first instruction after that with value 
-                            //sequence point with a valid start line
-                            Instruction[] jumpInstructions = (Instruction[])stateSwitch.Operand;
-
-                            foreach (var jumpInstr in jumpInstructions)
-                            {
-
-                                //where are we jumping to?
-                                Instruction destInstr = (Instruction)jumpInstr.Operand;
-                                if (destInstr == null) continue;
-
-                                SequencePoint destSeqPt = null;
-                                do
-                                {
-                                    destSeqPt = m.DebugInformation.GetSequencePoint(destInstr);
-                                    //TODO: temp constant to skip invalid lines
-                                    if (destSeqPt != null && destSeqPt.StartLine < 100000)
-                                    {
-
-                                        // Debug.Log(destSeqPt.Document.Url);
-                                        //   Debug.Log(destSeqPt.StartLine);
-
-                                        //TODO: dont want the full path, just relative to project
-
-                                        //TODO: If we have a URL from the sequence point then override the one we have because this will be more accurate
-
-                                        fullUrl = destSeqPt.Document.Url;
-                                        sourceMapping.sourceUrl = fullUrl.Substring(fullUrl.IndexOf("Assets"));
-
-                                        sourcePts.Add(destSeqPt.StartLine);
-                                    }
-                                    else
-                                    {
-                                        destSeqPt = null;
-                                        destInstr = destInstr.Next;
-                                    }
-
-                                } while (destSeqPt == null);
-                            }
-                        }
-                    }
-
-                    sourceMapping.stateSourcePoints = sourcePts.ToArray();
-                    assemblyDebugAsset.AddSourceMapping(sourceMapping);
-                }
-
-                EditorUtility.SetDirty(debugAsset);
-
-                // Stop stopwatch
-                stopwatch.Stop();
-                Debug.Log($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
+                Debug.LogError("Coroutinery: Could not load CoroutineDebugInfo asset");
+                return;
             }
 
+            Debug.Log($"Processing assembly: {assemblyPath}");
+
+            Stopwatch overallTimer = new Stopwatch();
+            overallTimer.Start();
+
+            //Use Cecil to load the assembly definition
+            AssemblyDefinition assemblyDef;
+            IEnumerable<TypeDefinition> typeDefs;
+            List<Type> enumeratorTypes = new List<Type>();
+
+            {
+                Stopwatch assemblyLoadTimer = new Stopwatch();
+                assemblyLoadTimer.Start();
+
+                assemblyDef = AssemblyDefinition.ReadAssembly(assemblyPath, new ReaderParameters { ReadSymbols = true, ReadWrite = false });
+                typeDefs = assemblyDef.MainModule.GetTypes();
+
+                assemblyLoadTimer.Stop();
+                Debug.Log($"Time loading type defs: {assemblyLoadTimer.ElapsedMilliseconds} ms");
+            }
+
+            CoroutineAssemblySourceMappings assemblyDebugAsset = debugInfoAsset.GetAssemblySourceMapping(assemblyDef.Name.Name);
+            assemblyDebugAsset.ClearData();
+
+            foreach (TypeDefinition typeDef in typeDefs)
+            {
+                if (!typeDef.HasCustomAttributes) continue;
+                //does it have the CompilerGeneratedAttribute 
+                bool isCompilerGenerated = typeDef.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.CompilerGeneratedAttribute");
+                if (!isCompilerGenerated) continue;
+
+                //does it have the IEnumerator interface
+                bool isEnumerator = typeDef.Interfaces.Any(i => i.InterfaceType.FullName == "System.Collections.IEnumerator");
+                if (!isEnumerator) continue;
+
+                CoroutineSourceMapping sourceMapping = new CoroutineSourceMapping();
+                sourceMapping.typeName = typeDef.Name;
+                sourceMapping.outerTypeName = typeDef.DeclaringType.Name;
+                sourceMapping.typeNamespace = typeDef.DeclaringType.Namespace;
+
+                List<int> sourcePts = new List<int>();
+
+                foreach (MethodDefinition m in typeDef.Methods)
+                {
+                    if (!m.Name.Contains("MoveNext")) continue;
+                    if (!m.HasBody) continue;
+                    if (m.DebugInformation == null) continue;
+                    if (!m.DebugInformation.HasSequencePoints) continue;
+                    
+                    Collection<Instruction> instructions = m.Body.Instructions;
+
+                    string fullUrl = m.DebugInformation.SequencePoints[0].Document.Url;
+                    string url = fullUrl.Substring(fullUrl.IndexOf("Assets"));
+                    sourceMapping.sourceUrl = url;
+                            
+                    //Most coroutines will have a switch on the current state
+                    Instruction stateSwitch = instructions.FirstOrDefault(i => (i.OpCode.Code == Code.Switch));
+                    if (stateSwitch != null)
+                    {
+                        //for each state jump instruction, get first instruction after that with value 
+                        //sequence point with a valid start line
+                        Instruction[] jumpInstructions = (Instruction[])stateSwitch.Operand;
+
+                        foreach (var jumpInstr in jumpInstructions)
+                        {
+                            //where are we jumping to?
+                            Instruction destInstr = (Instruction)jumpInstr.Operand;
+                            if (destInstr == null) continue;
+
+                            //get the sequence point for the destination instruction
+                            AddSourceMappingPoint(destInstr, m.DebugInformation, sourcePts);   
+                        }
+                    }
+                    else
+                    {
+                        //Simple coroutines might not have a switch on the current state
+                        //in that case we just use the first instruction after the yield return
+                        Instruction yieldReturnInstr = instructions.FirstOrDefault(i =>
+                                                                i.OpCode.Code == Code.Ldc_I4_1 && 
+                                                                i.Next != null &&
+                                                                i.Next.OpCode.Code == Code.Ret);
+                        if (yieldReturnInstr == null)
+                            continue;
+
+                        //get the sequence point for the destination instruction
+                        AddSourceMappingPoint(yieldReturnInstr, m.DebugInformation, sourcePts);
+                    }
+                }
+
+                sourceMapping.stateSourcePoints = sourcePts.ToArray();
+                assemblyDebugAsset.AddSourceMapping(sourceMapping);
+            }
+
+            EditorUtility.SetDirty(debugInfoAsset);
+
+            // Stop stopwatch
+            overallTimer.Stop();
+            Debug.Log($"Elapsed time: {overallTimer.ElapsedMilliseconds} ms");
+
+        }
+
+        private static void AddSourceMappingPoint(Instruction destInstr, MethodDebugInformation debugInformation, List<int> sourcePts)
+        {
+            SequencePoint destSeqPt;
+            do
+            {
+                destSeqPt = debugInformation.GetSequencePoint(destInstr);
+                //TODO: temp constant to skip invalid lines
+                if (destSeqPt != null && destSeqPt.StartLine < 100000)
+                {
+                    sourcePts.Add(destSeqPt.StartLine);
+                }
+                else
+                {
+                    destSeqPt = null;
+                    destInstr = destInstr.Next;
+                }
+
+            } while (destSeqPt == null);
         }
 
         private static CoroutineDebugInfo LoadCoroutineDebugAsset()
@@ -261,53 +210,40 @@ namespace aeric.coroutinery {
             string defaultPath = "Assets/coroutinery/Debug/";
             string filename = "coroutine_debug_info.asset";
             string fullPath = defaultPath + filename;
-            CoroutineDebugInfo debugAsset = null;
-
+            CoroutineDebugInfo debugAsset = AssetDatabase.LoadAssetAtPath<CoroutineDebugInfo>(fullPath);
+            if (debugAsset == null)
             {
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                debugAsset = AssetDatabase.LoadAssetAtPath<CoroutineDebugInfo>(fullPath);
-                if (debugAsset == null)
+                //Maybe it got moved, so do the more expensive search
+                string[] debugAssets = AssetDatabase.FindAssets("t:CoroutineDebugInfo");
+                if (debugAssets.Length == 0)
                 {
-                    //Maybe it got moved?
-                    string[] debugAssets = AssetDatabase.FindAssets("t:CoroutineDebugInfo");
-                    if (debugAssets.Length == 0)
+                    //No asset so lets create one
+                    debugAsset = ScriptableObject.CreateInstance<CoroutineDebugInfo>();
+                    AssetDatabase.CreateAsset(debugAsset, fullPath);
+                }
+                else
+                {
+                    //If we have more than one just take the first one
+                    if (debugAssets.Length > 1)
                     {
-                        //No asset so lets create one
-                        debugAsset = ScriptableObject.CreateInstance<CoroutineDebugInfo>();
-                        AssetDatabase.CreateAsset(debugAsset, fullPath);
-                    }
-                    else
-                    {
-                        //If we have more than one just take the first one
-                        if (debugAssets.Length > 1)
+                        Debug.LogWarning("Multiple CoroutineDebugInfo assets found:");
+                        foreach (var d in debugAssets)
                         {
-                            Debug.LogWarning("Multiple CoroutineDebugInfo assets found:");
-                            foreach (var d in debugAssets)
-                            {
-                                Debug.LogWarning(d);
-                            }
+                            Debug.LogWarning(d);
                         }
-
-                        fullPath = debugAssets[0];
-                        debugAsset = AssetDatabase.LoadAssetAtPath<CoroutineDebugInfo>(fullPath);
                     }
+
+                    fullPath = debugAssets[0];
+                    debugAsset = AssetDatabase.LoadAssetAtPath<CoroutineDebugInfo>(fullPath);
                 }
-
-                if (debugAsset == null)
-                {
-                    //we failed to find or create the asset
-                    Debug.LogError("Failed to find or create CoroutineDebugInfo asset");
-                }
-
-                //clear out any existing data, we are going to recreate it entirely
-                //debugAsset.ClearData();
-
-                stopwatch.Stop();
-                Debug.Log($"Time loading debug asset: {stopwatch.ElapsedMilliseconds} ms");
-
             }
+
+            if (debugAsset == null)
+            {
+                //we failed to find or create the asset
+                Debug.LogError("Failed to find or create CoroutineDebugInfo asset");
+            }
+
             return debugAsset;
         }
 
