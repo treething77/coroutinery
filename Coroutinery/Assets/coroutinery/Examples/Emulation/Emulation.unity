@@ -488,6 +488,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useCoroutinery: 1
   testComplete: 0
+  rotCnt: 0
 --- !u!65 &802525003
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -856,6 +857,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useCoroutinery: 0
   testComplete: 0
+  rotCnt: 0
 --- !u!1 &1716294828
 GameObject:
   m_ObjectHideFlags: 0

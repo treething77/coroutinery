@@ -410,6 +410,10 @@ namespace aeric.coroutinery
         private void DrawCoroutineDetails(CoroutineHandle coroutineHandle, float debugInfoAreaWidth)
         {
             SourceInfo debugInfo = CoroutineManager.Instance.GetCoroutineDebugInfo(coroutineHandle, _debugInfo);
+            if (debugInfo == null)
+            {
+                return;
+            }
 
             IEnumerator c = CoroutineManager.Instance.GetCoroutineEnumerator(coroutineHandle);
 

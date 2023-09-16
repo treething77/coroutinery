@@ -15,10 +15,110 @@ MonoBehaviour:
   assemblyMappings:
   - assemblyName: Assembly-CSharp
     sourceMapping:
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <Delay>d__0
+      typeNamespace: 
+      stateSourcePoints: c01c0000c41c0000c31c0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <Delay>d__1
+      typeNamespace: 
+      stateSourcePoints: ce1c0000cf1c0000d21c0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <Delay>d__2`1
+      typeNamespace: 
+      stateSourcePoints: de1c0000df1c0000e21c0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <DelayFrames>d__3
+      typeNamespace: 
+      stateSourcePoints: ed1c0000ee1c0000f11c0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <CancelWith>d__4
+      typeNamespace: 
+      stateSourcePoints: fd1c0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <CancelWith>d__5
+      typeNamespace: 
+      stateSourcePoints: 0b1d0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <CancelWith>d__6`1
+      typeNamespace: 
+      stateSourcePoints: 1a1d0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <CancelWith>d__7
+      typeNamespace: 
+      stateSourcePoints: 291d0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <PauseWith>d__8
+      typeNamespace: 
+      stateSourcePoints: 341d00003c1d0000411d0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <PauseWith>d__9
+      typeNamespace: 
+      stateSourcePoints: 4d1d0000551d00005a1d0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <PauseWith>d__10`1
+      typeNamespace: 
+      stateSourcePoints: 661d0000701d0000751d0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <PauseWith>d__11
+      typeNamespace: 
+      stateSourcePoints: 831d0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <KillWith>d__12
+      typeNamespace: 
+      stateSourcePoints: 8f1d0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <Append>d__13
+      typeNamespace: 
+      stateSourcePoints: 9a1d00009b1d0000a01d0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <Append>d__14
+      typeNamespace: 
+      stateSourcePoints: ac1d0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <Prepend>d__15
+      typeNamespace: 
+      stateSourcePoints: ba1d0000bc1d0000bf1d0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <Prepend>d__16
+      typeNamespace: 
+      stateSourcePoints: ce1d0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <Superimpose>d__18
+      typeNamespace: 
+      stateSourcePoints: e51d0000f01d0000f21d0000f41d0000f61d0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <Hijack>d__19
+      typeNamespace: 
+      stateSourcePoints: 031e0000
+      outerTypeName: MECExtensionMethods2
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <RerouteExceptions>d__20
+      typeNamespace: 
+      stateSourcePoints: 201e0000
+      outerTypeName: MECExtensionMethods2
     - sourceUrl: Assets\coroutinery\Scripts\CoroutineManager.cs
       typeName: <EndOfFrameRunner>d__2
       typeNamespace: aeric.coroutinery
-      stateSourcePoints: 64000000
+      stateSourcePoints: 65000000
       outerTypeName: CoroutineUpdater
     - sourceUrl: Assets\coroutinery\Examples\Emulation\UnityEmulationTest.cs
       typeName: <NestedTest>d__9
@@ -55,5 +155,75 @@ MonoBehaviour:
       typeNamespace: aeric.demos
       stateSourcePoints: 2e000000
       outerTypeName: PauseTest
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <_EOFPumpWatcher>d__137
+      typeNamespace: MEC
+      stateSourcePoints: 60030000
+      outerTypeName: Timing
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <_EOFPump>d__138
+      typeNamespace: MEC
+      stateSourcePoints: 6b030000
+      outerTypeName: Timing
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <_StartWhenDone>d__280
+      typeNamespace: MEC
+      stateSourcePoints: c5140000ce140000cd140000
+      outerTypeName: Timing
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <_StartWhenDone>d__285
+      typeNamespace: MEC
+      stateSourcePoints: 28150000291500002f150000
+      outerTypeName: Timing
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <_StartWhenDone>d__287
+      typeNamespace: MEC
+      stateSourcePoints: 44150000451500004b150000
+      outerTypeName: Timing
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <_StartWhenDone>d__292
+      typeNamespace: MEC
+      stateSourcePoints: 721500007315000079150000
+      outerTypeName: Timing
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <_InjectDelay>d__293
+      typeNamespace: MEC
+      stateSourcePoints: 7c1500007f15000082150000
+      outerTypeName: Timing
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <_DelayedCall>d__318
+      typeNamespace: MEC
+      stateSourcePoints: e8160000
+      outerTypeName: Timing
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <_WatchCall>d__339
+      typeNamespace: MEC
+      stateSourcePoints: 42180000
+      outerTypeName: Timing
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <_CallContinuously>d__340
+      typeNamespace: MEC
+      stateSourcePoints: 4e180000
+      outerTypeName: Timing
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <_WatchCall>d__357`1
+      typeNamespace: MEC
+      stateSourcePoints: 91190000
+      outerTypeName: Timing
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <_CallContinuously>d__358`1
+      typeNamespace: MEC
+      stateSourcePoints: 9d190000
+      outerTypeName: Timing
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <_OnDestroy>d__32
+      typeNamespace: MEC
+      stateSourcePoints: 091b0000
+      outerTypeName: CoroutineHandle
+    - sourceUrl: Assets\competitors\Trinary Software\Timing.cs
+      typeName: <_OnDestroy>d__33
+      typeNamespace: MEC
+      stateSourcePoints: 101b0000111b0000141b0000
+      outerTypeName: CoroutineHandle
   - assemblyName: Assembly-CSharp-Editor
     sourceMapping: []

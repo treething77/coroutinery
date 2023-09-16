@@ -1,3 +1,4 @@
+using DTT.Utils.CoroutineManagement;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -124,7 +125,8 @@ namespace aeric.coroutinery
             Update,
             FixedUpdate,
             LateUpdate,
-            EndOfFrame
+            EndOfFrame,
+        //    UpdatePending
         }
 
         private static CoroutineManager _manager;
@@ -147,18 +149,47 @@ namespace aeric.coroutinery
 
         private CoroutineUpdater _updater;
 
+        enum CoroutineState // 16 bits?
+        {
+            Running,
+            Finished,
+            Pending,
+            Waiting_CustomYield,
+            Waiting_Coroutine,
+            Waiting_Time,
+            Waiting_Realtime,
+            Waiting_Frame,
+
+        }
+
+        class CoroutineData
+        {
+            public CoroutineHandle _handle;
+            public IEnumerator _enumerator;
+            public CoroutineState _state;
+            public bool _paused;
+            public RunPhase _runPhase;
+            public float _waitEndTime;
+            public ulong _waitCoroutineId;
+            public Action _stopAction;
+            public Action _finishedAction;
+
+            public CoroutineData(CoroutineHandle coroutineHandle, IEnumerator coroutine)
+            {
+                this._handle = coroutineHandle;
+                this._enumerator = coroutine;
+            }
+        }
+
+        private List<CoroutineData> _coroutines = new List<CoroutineData>();
+
         //This is used to emulate an oddity of the Unity behavior where a coroutine that yields in the fixed update does not
         //run again on the same frame even though it seems like it should since Update runs after FixedUpdate
         //so we introduce an artificial delay of one frame for coroutines that yield in the fixed update 
-        private List<CoroutineHandle> _pendingList = new List<CoroutineHandle>();
 
+        private List<CoroutineData> _killList = new List<CoroutineData>();//temp list of coroutines to kill
+        private List<CoroutineData> _startList = new List<CoroutineData>();//temp list of coroutines to start
 
-        private List<CoroutineHandle> _activeList = new List<CoroutineHandle>();
-        private List<CoroutineHandle> _pausedList = new List<CoroutineHandle>();
-        private List<CoroutineHandle> _killList = new List<CoroutineHandle>();//temp list of coroutines to kill
-
-        private Dictionary<CoroutineHandle, IEnumerator> _enumeratorLookup = new Dictionary<CoroutineHandle, IEnumerator>();
-        private Dictionary<IEnumerator, CoroutineHandle> _handleLookup = new Dictionary<IEnumerator, CoroutineHandle>();
 
         private Dictionary<string, List<CoroutineHandle>> _tags = new Dictionary<string, List<CoroutineHandle>>();
         private Dictionary<int, List<CoroutineHandle>> _layers = new Dictionary<int, List<CoroutineHandle>>();
@@ -166,11 +197,6 @@ namespace aeric.coroutinery
 
         private ulong _nextId = 0;
                 
-        //wait lists - coroutines that yielded on things we are waiting to complete
-        private List<CoroutineHandle> _endOfFrameRunners = new List<CoroutineHandle>();
-        private List<CoroutineHandle> _fixedUpdateRunners = new List<CoroutineHandle>();
-        private List<CoroutineHandle> _lateUpdateRunners = new List<CoroutineHandle>();
-
         private FieldInfo waitForSecondValue;
 
         struct WaitTimer
@@ -179,21 +205,12 @@ namespace aeric.coroutinery
             public CoroutineHandle handle;
         }
 
-        private List<WaitTimer> _waitTimers = new List<WaitTimer>();
-        private List<WaitTimer> _pausedWaitTimers = new List<WaitTimer>();
-
         struct WaitCoroutine
         {
             public CoroutineHandle subcoroutine;//coroutine that we are waiting on
             public CoroutineHandle handle;//coroutine that is waiting
         }
 
-        private List<WaitCoroutine> _waitCoroutines = new List<WaitCoroutine>();
-
-        private List<CoroutineHandle> _customYieldList = new List<CoroutineHandle>();
-        private List<CoroutineHandle> _pausedCustomYieldList = new List<CoroutineHandle>();
-        private Dictionary<CoroutineHandle,Action> _stopCallbacks = new Dictionary<CoroutineHandle, Action>();
-        private Dictionary<CoroutineHandle, Action> _finishedCallbacks = new Dictionary<CoroutineHandle, Action>();
         private Dictionary<CoroutineHandle, string> _stackTrace = new Dictionary<CoroutineHandle, string>();
 
         public static void CreateManager()
@@ -214,138 +231,121 @@ namespace aeric.coroutinery
             Instance.Run(RunPhase.Update);
 
             //handle wait timers
-            Instance.RunWaitTimers();
-
-            //handle frame timers
-            Instance.RunCustomYields();
-
-            Instance.RunPending();
-
+            Instance.RunTimersAndCustomYields();
         }
 
-        private void RunPending()
+        private void RunTimersAndCustomYields()
         {
-            foreach(var c in _pendingList)
-            {
-                addCoroutineToRunnerList(c, _activeList);
-            }
-            _pendingList.Clear();
-        }
 
-        private void RunCustomYields()
-        {
-            for (int i = _customYieldList.Count - 1; i > -1; i--)
+
+            foreach (var c in _coroutines)
             {
-                var handle = _customYieldList[i];
-                var enumerator = _enumeratorLookup[handle];
-                if (!(enumerator.Current as CustomYieldInstruction).keepWaiting)
+                //if a coroutine is paused then exit early
+                if (c._paused)
                 {
-                    addCoroutineToRunnerList(handle, _activeList);
-                    _customYieldList.RemoveAt(i);
-
-                    //immediately run the coroutine that was waiting
-                    RunCoroutineStep(handle, RunPhase.Update);
+                    if (c._state == CoroutineState.Waiting_Time || c._state == CoroutineState.Waiting_Realtime)
+                    { 
+                        //For any paused coroutines waiting on a timer we will push the end time back
+                        //by the amount of time we were paused
+                        c._waitEndTime += Time.deltaTime;
+                    }   
+                    continue;
                 }
-            }
 
-            if (_waitCoroutines.Count > 0)
-            {
-                var waitListcopy = new List<WaitCoroutine>(_waitCoroutines);
+                if (c._state == CoroutineState.Waiting_CustomYield)
+                {
+                    var handle = c._handle;
+                    var enumerator = c._enumerator;
+                    if (!(enumerator.Current as CustomYieldInstruction).keepWaiting)
+                    {
+                        c._state = CoroutineState.Running;
 
-                foreach (var w in waitListcopy)
+                        //immediately run the coroutine that was waiting
+                        RunCoroutineStep(c, RunPhase.Update);
+                    }
+                }
+                else if (c._state == CoroutineState.Waiting_Coroutine)
                 {
                     //If we are waiting on a coroutine that isn't in our system then go back to active
-                    if (!_enumeratorLookup.ContainsKey(w.subcoroutine))
+                    //Technically this should never be required, because when a coroutine ends we check if any other coroutines are waiting on it
+                    if (GetCoroutineEnumerator(new CoroutineHandle(c._waitCoroutineId)) == null)
                     {
-                        addCoroutineToRunnerList(w.handle, _activeList);
-                        _waitCoroutines.Remove(w);
+                        c._state = CoroutineState.Running;
+                    }
+                }
+                else if (c._state == CoroutineState.Waiting_Time)
+                {                    
+                    if (Time.time >= c._waitEndTime)
+                    {
+                        c._state = CoroutineState.Running;
+
+                        //immediately run the coroutine that was waiting
+                        RunCoroutineStep(c, RunPhase.Update);
+                    }
+                }
+                else if (c._state == CoroutineState.Waiting_Realtime)
+                {
+                    if (Time.realtimeSinceStartup >= c._waitEndTime)
+                    {
+                        c._state = CoroutineState.Running;
+
+                        //immediately run the coroutine that was waiting
+                        RunCoroutineStep(c, RunPhase.Update);
                     }
                 }
             }
-        }
 
-        private void RunWaitTimers()
-        {
-            for (int i = _waitTimers.Count - 1; i > -1; i--)
+            foreach (var c in _coroutines)
             {
-                var timer = _waitTimers[i];
-                if (Time.time >= timer.endTime)
+                if (c._state == CoroutineState.Pending)
                 {
-                    addCoroutineToRunnerList(timer.handle, _activeList);
-                    _waitTimers.RemoveAt(i);
-
-                    //immediately run the coroutine that was waiting
-                    RunCoroutineStep(timer.handle, RunPhase.Update);
+                    c._runPhase = RunPhase.Update;
+                    c._state = CoroutineState.Running;
                 }
-            }
-
-            //For any paused coroutines waiting on a timer we will push the end time back
-            //by the amount of time we were paused
-            for (int i = _pausedWaitTimers.Count - 1; i > -1; i--)
-            {
-                var timer = _pausedWaitTimers[i];
-                timer.endTime += Time.deltaTime;
-                _pausedWaitTimers[i] = timer;
             }
         }
 
         private void Run(RunPhase phase)
         {
-            //get the correct coroutine list
-            List<CoroutineHandle> srcList = GetPhaseCoroutines(phase);
-            List<CoroutineHandle> listCopy = new List<CoroutineHandle>(srcList);
-
-            RunCoroutinesInPhase(listCopy, phase);
-        }
-
-        private void RunCoroutinesInPhase(List<CoroutineHandle> coroutines, RunPhase phase)
-        {
-            foreach (var co in coroutines)
+            foreach (var co in _coroutines)
             {
-                RunCoroutineStep(co, phase);
+                if (co._runPhase == phase)
+                {
+                    RunCoroutineStep(co, phase);
+                }
             }
+
+            foreach(var c in _startList)
+            {
+                _coroutines.Add(c);
+            }
+            _startList.Clear();
 
             KillCoroutines();
-        }
-
-        private List<CoroutineHandle> GetPhaseCoroutines(RunPhase phase)
-        {
-            switch (phase)
-            {
-                case RunPhase.Update:
-                    return _activeList;
-                case RunPhase.EndOfFrame:
-                    return _endOfFrameRunners;
-                case RunPhase.FixedUpdate:
-                    return _fixedUpdateRunners;
-                case RunPhase.LateUpdate:
-                    return _lateUpdateRunners;
-            }
-            //TODO: error
-            return null;
         }
 
         private void KillCoroutines()
         {
             //remove from any runner or wait lists it was in
             foreach (var kill in _killList)
-                StopCoroutine(kill);
+                CoroutineCleanup(kill);
             _killList.Clear();
         }
 
-        private void RunCoroutineStep(CoroutineHandle handle, RunPhase phase)
+        private void RunCoroutineStep(CoroutineData coroutine, RunPhase phase)
         {
-            IEnumerator co;
-            if (!_enumeratorLookup.TryGetValue(handle, out co))
+            IEnumerator co = coroutine._enumerator;
+
+            //Only call MoveNext is the coroutine is in the active state
+            if (coroutine._state != CoroutineState.Running)
             {
-                //TODO: error if not found
                 return;
             }
 
             //do the MoveNext first and then handle the results
             if (!co.MoveNext())
             {
-                CoroutineFinished(co, handle);
+                CoroutineFinished( coroutine );
             }
             else
             {
@@ -353,113 +353,93 @@ namespace aeric.coroutinery
                 if (co.Current == null)
                 {
                     //if we yielded on null, then add back to the active list regardless of which phase we are currently running
-                    addCoroutineToRunnerList(handle, _pendingList);
+                    coroutine._state = CoroutineState.Pending;
                 }
                 //if we are waiting on a timer, start it now?
-                if (co.Current is WaitForSeconds)
+                else if (co.Current is WaitForSeconds)
                 {
                     //remove from whichever runner list and add to a wait list
-                    removeFromRunnerLists(handle);
-
-                    WaitTimer wt = new WaitTimer();
-                    wt.handle = handle;
-                    wt.endTime = Time.time + (waitForSecondValue.GetValue(co.Current) as float? ?? 0.0f);
-
-                    _waitTimers.Add(wt);
+                    coroutine._state = CoroutineState.Waiting_Time;
+                    coroutine._waitEndTime = Time.time + (waitForSecondValue.GetValue(co.Current) as float? ?? 0.0f);
+                }
+                else if (co.Current is WaitForSecondsRealtime)
+                {
+                    coroutine._state = CoroutineState.Waiting_Realtime;
+                    var wr = co.Current as WaitForSecondsRealtime;
+                    coroutine._waitEndTime = Time.realtimeSinceStartup + wr.waitTime;
                 }
                 else if (co.Current is WaitForEndOfFrame)
                 {
                     //remove from whichever runner list and add to the end of frame list
-                    addCoroutineToRunnerList(handle, _endOfFrameRunners);
+                    coroutine._runPhase = RunPhase.EndOfFrame;
                 }
                 else if (co.Current is WaitForFixedUpdate)
                 {
-                    //remove from whichever runner list and add to the fixed update list
-                    addCoroutineToRunnerList(handle, _fixedUpdateRunners);
+                    coroutine._runPhase = RunPhase.FixedUpdate;
                 }
                 else if (co.Current is WaitForLateUpdate)
                 {
-                    //remove from whichever runner list and add to the fixed update list
-                    addCoroutineToRunnerList(handle, _lateUpdateRunners);
+                    coroutine._runPhase = RunPhase.LateUpdate;
                 }
                 else if (co.Current is CustomYieldInstruction)
                 {
-                    //remove from whichever runner list and add to a wait list
-                    //remove from runner lists, add to wait list
-                    removeFromRunnerLists(handle);
-                    _customYieldList.Add(handle);
+                    coroutine._state = CoroutineState.Waiting_CustomYield;
                 }
-                else if (co.Current is IEnumerator && _handleLookup.ContainsKey(co.Current as IEnumerator))
+                else if (co.Current is IEnumerator)
                 {
                     //TODO: if we are waiting on an enumator that is not already in our system then we need to add it
                     // this can happen when someone starts a coroutine using
                     // e.g. "yield return Moveit()" vs
                     //      "yield return StartCoroutine(Moveit())"
 
-                    //Check if this coroutine is on the kill list
-                    var subcoroutineHandle = _handleLookup[co.Current as IEnumerator];
-                //    if (!_killList.Contains(subcoroutineHandle))
-                    {
-                        //if we are waiting on another coroutine then remove from runner lists and put on a wait list
-                        removeFromRunnerLists(handle);
-
-                        WaitCoroutine wc = new WaitCoroutine();
-                        wc.handle = handle;
-                        wc.subcoroutine = subcoroutineHandle;
-                        _waitCoroutines.Add(wc);
-                    }
+                    coroutine._state = CoroutineState.Waiting_Coroutine;
+                    coroutine._waitCoroutineId = GetCoroutineIdFromEnumerator(co.Current as IEnumerator);
                 }
             }
         }
 
-        private void addCoroutineToRunnerList(CoroutineHandle handle, List<CoroutineHandle> runnerList)
+        private ulong GetCoroutineIdFromEnumerator(IEnumerator enumerator)
         {
-            removeFromRunnerLists(handle);
-            runnerList.Add(handle);
+            foreach(var c in _coroutines)
+            {
+                if (c._enumerator == enumerator)
+                    return c._handle._id;
+            }
+            foreach (var c in _startList)
+            {
+                if (c._enumerator == enumerator)
+                    return c._handle._id;
+            }
+            return CoroutineHandle.InvalidHandle._id;
         }
 
-        private bool removeFromRunnerLists(CoroutineHandle handle)
-        {
-            //TODO: should only be in one list at a time
-            bool found = false;
-
-            if (_activeList.Contains(handle)) {_activeList.Remove(handle); found = true;}
-            if (_endOfFrameRunners.Contains(handle)) { _endOfFrameRunners.Remove(handle); found = true; }
-            if (_fixedUpdateRunners.Contains(handle)) { _fixedUpdateRunners.Remove(handle); found = true;}
-            if (_lateUpdateRunners.Contains(handle)) { _lateUpdateRunners.Remove(handle); found = true;}
-
-            return found;
-        }
-
-        private void CoroutineFinished(IEnumerator co, CoroutineHandle handle)
+ 
+        private void CoroutineFinished(CoroutineData coroutine)
         {
             //Add to the kill list to be processed at the end of the frame
             //do we need this since we are iterating a copy of the runner list?
-            _killList.Add(handle);
+            _killList.Add(coroutine);
 
-            removeFromRunnerLists(handle);
-
-            if (_finishedCallbacks.TryGetValue(handle, out var callback))
+            coroutine._state = CoroutineState.Finished;
+            if (coroutine._finishedAction != null)
             {
-                callback?.Invoke();
-                _finishedCallbacks.Remove(handle);
+                coroutine._finishedAction();
             }
 
             if (BreakOnFinished)
             {
-                Debug.Log("Coroutine Finished: " + co.ToString());
+                Debug.Log("Coroutine Finished: " + coroutine.ToString());
                 Debug.Break();
             }
 
             //check for any coroutines waiting on this one. Remove them from the wait list and
             //immediately trigger them (ie call RunCoroutineStep with them)
-            foreach (var wc in _waitCoroutines)
+            foreach(var co in _coroutines)
             {
-                if (wc.subcoroutine._id == handle._id)
+                if (co._state == CoroutineState.Waiting_Coroutine && co._waitCoroutineId == coroutine._handle._id)
                 {
-                    _waitCoroutines.Remove(wc);
-                    RunCoroutineStep(wc.handle, RunPhase.Update);
-                    break;
+                    co._state = CoroutineState.Running;
+                    RunCoroutineStep(co, RunPhase.Update);
                 }
             }
         }
@@ -507,6 +487,7 @@ namespace aeric.coroutinery
         public CoroutineHandle Start(IEnumerator coroutine, Object context = null, string tag = null, int layer = 0)
         {
             _nextId++;
+
             CoroutineHandle coroutineHandle = new CoroutineHandle(_nextId);
 
             //TODO: store the stack trace for debugging
@@ -516,53 +497,63 @@ namespace aeric.coroutinery
                 _stackTrace[coroutineHandle] = stackTrace;
             }
 
-            _activeList.Add(coroutineHandle);
-            _enumeratorLookup.Add(coroutineHandle, coroutine);
-            _handleLookup.Add(coroutine, coroutineHandle);
+            //TODO: context, tag, layer
 
-            RunCoroutineStep(coroutineHandle, RunPhase.Update);
+            CoroutineData coroutineData = new CoroutineData(coroutineHandle, coroutine);
+            coroutineData._state = CoroutineState.Running;
+            coroutineData._enumerator = coroutine;
+            coroutineData._runPhase = RunPhase.Update;
+
+            _startList.Add(coroutineData);
+
+            RunCoroutineStep(coroutineData, RunPhase.Update);
 
             return coroutineHandle;
         }
 
         public void StopCoroutine(CoroutineHandle handle)
         {
-            if (_stopCallbacks.TryGetValue(handle, out var callback))
+            foreach (var c in _coroutines)
             {
-                callback?.Invoke();
-                _stopCallbacks.Remove(handle);
+                if (c._handle._id == handle._id)
+                {
+                    StopCoroutineInternal(c);
+                    break;
+                }
+            }
+        }
+
+        private void StopCoroutineInternal(CoroutineData coroutine)
+        {
+            if (coroutine._stopAction != null)
+            {
+                coroutine._stopAction();
             }
 
-            //remove from _activeList, lookups, kill list etc
-            removeFromRunnerLists(handle);
+            CoroutineCleanup(coroutine);
+        }
 
-            //TODO: ssdfremove from kill list
-            //TODO: remove from wait lists
-            
+        private void CoroutineCleanup(CoroutineData coroutine)
+        { 
             //Remove from context lists
             foreach (var contextList in _context)
             {
-                if (contextList.Value.Contains(handle)) contextList.Value.Remove(handle);
+                if (contextList.Value.Contains(coroutine._handle)) contextList.Value.Remove(coroutine._handle);
             }
 
             //Remove from tag lists
             foreach (var tagList in _tags)
             {
-                if (tagList.Value.Contains(handle)) tagList.Value.Remove(handle);
+                if (tagList.Value.Contains(coroutine._handle)) tagList.Value.Remove(coroutine._handle);
             }
 
             //Remove from layer lists
             foreach (var layerList in _layers)
             {
-                if (layerList.Value.Contains(handle)) layerList.Value.Remove(handle);
+                if (layerList.Value.Contains(coroutine._handle)) layerList.Value.Remove(coroutine._handle);
             }
 
-            //TODO: remove from pending list
-            //TODO: remove from paused lists
-
-            IEnumerator co = _enumeratorLookup[handle];
-            _enumeratorLookup.Remove(handle);
-            _handleLookup.Remove(co);
+            _coroutines.Remove(coroutine);
         }
 
         public void StopCoroutines(List<CoroutineHandle> coroutines)
@@ -572,7 +563,10 @@ namespace aeric.coroutinery
 
         public void StopAllCoroutines()
         {
-            StopCoroutines(_activeList);
+            foreach (var c in _coroutines)
+            {
+                StopCoroutineInternal(c);
+            }
         }
 
         public void StopCoroutinesByTag(string tag)
@@ -637,48 +631,27 @@ namespace aeric.coroutinery
             return _context[context];
         }
 
+        private bool CoroutineIsOnKillList(CoroutineHandle handle)
+        {
+            foreach(var c in _killList)
+            {
+                if (c._handle._id == handle._id) return true;
+            }
+            return false;
+        }
+
         public void PauseCoroutine(CoroutineHandle handle)
         {
-            if (_killList.Contains(handle)) return; //TODO: error?
+            if (CoroutineIsOnKillList(handle)) return;
+
+            var c = GetCoroutineByHandle(handle);
 
             //if this coroutine is waiting on another coroutine then pause that one too
-            foreach (var wc in _waitCoroutines) {
-                if (wc.handle._id == handle._id) {
-                    PauseCoroutine(wc.subcoroutine);
-                }
-            }
-
-            //If the coroutine is in an active runner list then add it to our paused list
-            if (removeFromRunnerLists(handle))
+            if (c._state == CoroutineState.Waiting_Coroutine)
             {
-                _pausedList.Add(handle);
+                PauseCoroutine(new CoroutineHandle(c._waitCoroutineId));
             }
-            else
-            {
-                //if the coroutine is waiting on a timer then it is sufficient to just not run the timer
-                // when pausing remove from waitTimers add to pausedWaitTimers
-                foreach (var wt in _waitTimers)
-                {
-                    if (wt.handle._id == handle._id)
-                    {
-                        _pausedWaitTimers.Add(wt);
-                        _waitTimers.Remove(wt);
-                        break;
-                    }
-                }
-
-                //if the coroutine is waiting on a custom yield instruction then it is sufficient to just not check the end condition
-                // when pausing remove from customYieldList add to pausedCustomYieldList
-                foreach (var ct in _customYieldList)
-                {
-                    if (ct._id == handle._id)
-                    {
-                        _pausedCustomYieldList.Add(ct);
-                        _customYieldList.Remove(ct);
-                        break;
-                    }
-                }
-            }
+            c._paused = true;
         }
 
         public void PauseCoroutinesByTag(string tag)
@@ -703,9 +676,17 @@ namespace aeric.coroutinery
 
         public void ResumeCoroutine(CoroutineHandle handle) 
         {
-            //TODO: if this coroutine is in the kill list then dont do anything
-            addCoroutineToRunnerList(handle, _activeList);    
-            _pausedList.Remove(handle);
+            CoroutineData c = GetCoroutineByHandle(handle);
+            if (c == null) return;//TODO: error
+
+            //c._state = CoroutineState.Running;
+            c._paused = false;
+
+            //if this coroutine is waiting on another coroutine then resume that one too
+            if (c._state == CoroutineState.Waiting_Coroutine)
+            {
+                ResumeCoroutine(new CoroutineHandle(c._waitCoroutineId));
+            }
         }
 
         public void ResumeCoroutines(List<CoroutineHandle> coroutines)
@@ -793,8 +774,11 @@ namespace aeric.coroutinery
 
         //Get the paused state of a coroutine
         public bool GetCoroutinePaused(CoroutineHandle handle) 
-        { 
-            return _pausedList.Contains(handle);
+        {
+            CoroutineData c = GetCoroutineByHandle(handle);
+            if (c == null) return false;//TODO: error
+
+            return c._paused;
         }
 
         //Get the active state of a coroutine
@@ -802,12 +786,25 @@ namespace aeric.coroutinery
 
         //Set the callback for whendd a coroutine is stopped
         public void SetCoroutineOnStop(CoroutineHandle handle, Action callback) {
-            _stopCallbacks[handle] = callback;
+            CoroutineData c = GetCoroutineByHandle(handle);
+            if (c == null) return;//TODO: error
+            c._stopAction = callback;
+        }
+
+        private CoroutineData GetCoroutineByHandle(CoroutineHandle handle)
+        {
+            foreach(var c in _coroutines)
+            {
+                if (c._handle._id == handle._id) return c;
+            }
+            return null;
         }
 
         //Set the callback for when a coroutine is finished  
         public void SetCoroutineOnFinished(CoroutineHandle handle, Action callback) {
-            _finishedCallbacks[handle] = callback;
+            CoroutineData c = GetCoroutineByHandle(handle);
+            if (c == null) return;//TODO: error
+            c._finishedAction = callback;
         }
 
         //////////////////////////////////////////////////////////////////////////////
@@ -835,8 +832,10 @@ namespace aeric.coroutinery
         public SourceInfo GetCoroutineDebugInfo(CoroutineHandle coroutineHandle, CoroutineDebugInfo d)
         {
           //  string debugInfo = string.Empty;
+            CoroutineData coroutine = GetCoroutineByHandle(coroutineHandle);
+            if (coroutine == null) return null;
 
-            IEnumerator c = _enumeratorLookup[coroutineHandle];
+            IEnumerator c = coroutine._enumerator;
             Type typ = c.GetType();
             FieldInfo type = typ.GetField("<>1__state", BindingFlags.NonPublic | BindingFlags.Instance);
             int stateValue = (int)type.GetValue(c);
@@ -849,12 +848,18 @@ namespace aeric.coroutinery
 
         public IEnumerator GetCoroutineEnumerator(CoroutineHandle coroutineHandle)
         {
-            return _enumeratorLookup[coroutineHandle];
+            CoroutineData coroutine = GetCoroutineByHandle(coroutineHandle);
+            if (coroutine == null) return null;//TODO: error
+            return coroutine._enumerator;
         }
 
         public CoroutineHandle GetCoroutineHandle(IEnumerator enumerator)
         {
-            return _handleLookup[enumerator];
+            foreach(var c in _coroutines)
+            {
+                if (c._enumerator == enumerator) return c._handle;
+            }
+            return CoroutineHandle.InvalidHandle;
         }
 
         public string GetCoroutinePrettyName(CoroutineHandle coroutine, CoroutineDebugInfo debugInfo)
@@ -874,7 +879,7 @@ namespace aeric.coroutinery
 
             //extract the method name from the enumerator type name  
             string methodName = string.Empty;
-            if (debugInfo != null)
+            if (coroutineDebug != null)
             {
                 methodName = coroutineDebug.enumeratorTypeName;
                 int index1 = methodName.IndexOf('<');
@@ -890,18 +895,18 @@ namespace aeric.coroutinery
 
         public float GetWaitTimeRemaining(CoroutineHandle coroutineHandle)
         {
-            //check the waitTimers list for this coroutine
-            foreach(var wt in _waitTimers)
+            CoroutineData coroutine = GetCoroutineByHandle(coroutineHandle);
+            if (coroutine == null) return 0.0f;//TODO: error
+            float waitTimeRemaining = 0.0f;
+            if (coroutine._state == CoroutineState.Waiting_Time)
             {
-                if (wt.handle._id == coroutineHandle._id)
-                {
-                    float timeLeft = wt.endTime - Time.time;
-                    return timeLeft;
-                }
+                waitTimeRemaining = coroutine._waitEndTime - Time.time;
             }
-
-            //TODO: error
-            return 0.0f;
+            else if (coroutine._state == CoroutineState.Waiting_Realtime)
+            {
+                waitTimeRemaining = coroutine._waitEndTime - Time.time;
+            }
+            return waitTimeRemaining;
         }
 
         public List<CoroutineHandle> GetCoroutineStack(CoroutineHandle coroutineHandle)
@@ -935,27 +940,25 @@ namespace aeric.coroutinery
 
         private CoroutineHandle GetCoroutineChild(CoroutineHandle currentHandle)
         {
-            //check if there is a coroutine we are waiting on
-            foreach (WaitCoroutine wt in _waitCoroutines)
+            CoroutineData c = GetCoroutineByHandle(currentHandle);
+            if (c == null) return CoroutineHandle.InvalidHandle;
+            if (c._state == CoroutineState.Waiting_Coroutine)
             {
-                if (wt.handle._id == currentHandle._id)
-                {
-                    return wt.subcoroutine;
-                }
+                return new CoroutineHandle(c._waitCoroutineId);
             }
             return CoroutineHandle.InvalidHandle;
         }
 
         private CoroutineHandle GetCoroutineParent(CoroutineHandle currentHandle)
         {
-            //check if there is a coroutine waiting on this one
-            foreach (WaitCoroutine wt in _waitCoroutines)
+            foreach(var c in _coroutines)
             {
-                if (wt.subcoroutine._id == currentHandle._id)
+                if (c._state == CoroutineState.Waiting_Coroutine && c._waitCoroutineId == currentHandle._id)
                 {
-                    return wt.handle;
+                    return c._handle;
                 }
             }
+
             return CoroutineHandle.InvalidHandle;
         }
     }

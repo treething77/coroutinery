@@ -134,7 +134,7 @@ namespace aeric.demos
         {
             RecordTiming("move - start");
 
-            yield return new WaitForSecondsRealtime(0.5f);
+            yield return new WaitForSecondsRealtime(1.5f);
 
             RecordTiming("move - up");
             movingUp = true;
