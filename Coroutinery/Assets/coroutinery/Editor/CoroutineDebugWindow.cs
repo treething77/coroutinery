@@ -485,35 +485,30 @@ namespace aeric.coroutinery
                 //what is the coroutine waiting on?
                 if (c.Current != null)
                 {
-                    //TODO: string constants
-                    EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
-                    if (c.Current is WaitForSeconds)
+                    if ((c.Current is WaitForSeconds) || (c.Current is WaitForSecondsRealtime))
                     {
-                        WaitForSeconds wait = c.Current as WaitForSeconds;
-
+                        EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
                         //need to ask the coroutine manager for the time remaining
                         float remaining = CoroutineManager.Instance.GetWaitTimeRemaining(coroutineHandle);
                         EditorGUILayout.LabelField("Time remaining: " + remaining);
                     }
-                    else if (c.Current is WaitForSecondsRealtime)
-                    {
-
-                    }
                     else if (c.Current is WaitForFrames)
                     {
-
+                        EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
+                        var wf = c.Current as WaitForFrames;
+                        EditorGUILayout.LabelField("Frames remaining: " + wf.framesRemaining);
                     }
                     else if (c.Current is WaitWhile)
                     {
-                        //can we print out something related to the action?
-                        WaitWhile wait = c.Current as WaitWhile;
+                        EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
                     }
                     else if (c.Current is WaitUntil)
                     {
-
+                        EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
                     }
                     else if (c.Current is IEnumerator)
                     {
+                        EditorGUILayout.LabelField("Waiting on:");
                         //get the pretty name for the coroutine we are waiting on
                         IEnumerator current = c.Current as IEnumerator;
                         var currentHandle = CoroutineManager.Instance.GetCoroutineHandle(c.Current as IEnumerator);
@@ -529,7 +524,6 @@ namespace aeric.coroutinery
                         }//end horizontal scope
                     }
                 }
-
 
                 //draw dividor
                 dividorRect = EditorGUILayout.GetControlRect(GUILayout.Height(2 + 4));
@@ -557,7 +551,7 @@ namespace aeric.coroutinery
                     methodName = methodName.Substring(start + 1, end - start - 1);
                 }
 
-                EditorGUILayout.TextArea(debugInfo.outerTypeName + "." + methodName + " (" + debugInfo.url + ":" + debugInfo.lineNumber + ")");
+                EditorGUILayout.LabelField(debugInfo.outerTypeName + "." + methodName + " (" + debugInfo.url + ":" + debugInfo.lineNumber + ")", EditorStyles.textField);
 
             }//end vertical scope
 
@@ -657,7 +651,7 @@ namespace aeric.coroutinery
                         if (i > 0)
                             GUILayout.Label(stackPtrIcon, GUILayout.Width(20), GUILayout.Height(20));
 
-                        EditorGUILayout.TextArea(callSite + " (" + sourceFile + ":" + sourceLineNumber + ")");
+                        EditorGUILayout.LabelField(callSite + " (" + sourceFile + ":" + sourceLineNumber + ")", EditorStyles.textField);
                     }//end horizontal scope
 
                     i++;

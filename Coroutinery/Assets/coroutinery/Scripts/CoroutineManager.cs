@@ -1,18 +1,22 @@
-using DTT.Utils.CoroutineManagement;
+//#define DISABLE_AERIC_LOGS //define this to remove all logs from builds
+#if !DISABLE_AERIC_LOGS
+#define NOT_DISABLE_AERIC_LOGS
+#endif
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
-using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
 
 namespace aeric.coroutinery
 {
-    //TODO: dont have this as an extension it pollutes the namespace
     public static class ReflectionExtensions
     {
-        public static T GetFieldValue<T>(this object obj, string name)
+        public static T GetFieldValue<T>(object obj, string name)
         {
             // Set the flags so that private and public fields from instances will be found
             var bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
@@ -27,7 +31,7 @@ namespace aeric.coroutinery
             return field;
         }
 
-        public static T GetFieldValue<T>(this object obj, FieldInfo fieldInfo)
+        public static T GetFieldValue<T>(object obj, FieldInfo fieldInfo)
         {
             return (T)fieldInfo?.GetValue(obj);
         }
@@ -58,13 +62,9 @@ namespace aeric.coroutinery
             _endFrame = Time.frameCount + frames;
         }
 
-        public override bool keepWaiting
-        {
-            get
-            {
-                return Time.frameCount < _endFrame;
-            }
-        }
+        public int framesRemaining => _endFrame - Time.frameCount;
+
+        public override bool keepWaiting => framesRemaining > 0;
     }
 
     public class WaitForLateUpdate : YieldInstruction
@@ -183,10 +183,6 @@ namespace aeric.coroutinery
 
         private List<CoroutineData> _coroutines = new List<CoroutineData>();
 
-        //This is used to emulate an oddity of the Unity behavior where a coroutine that yields in the fixed update does not
-        //run again on the same frame even though it seems like it should since Update runs after FixedUpdate
-        //so we introduce an artificial delay of one frame for coroutines that yield in the fixed update 
-
         private List<CoroutineData> _killList = new List<CoroutineData>();//temp list of coroutines to kill
         private List<CoroutineData> _startList = new List<CoroutineData>();//temp list of coroutines to start
 
@@ -198,18 +194,6 @@ namespace aeric.coroutinery
         private ulong _nextId = 0;
                 
         private FieldInfo waitForSecondValue;
-
-        struct WaitTimer
-        {
-            public float endTime;
-            public CoroutineHandle handle;
-        }
-
-        struct WaitCoroutine
-        {
-            public CoroutineHandle subcoroutine;//coroutine that we are waiting on
-            public CoroutineHandle handle;//coroutine that is waiting
-        }
 
         private Dictionary<CoroutineHandle, string> _stackTrace = new Dictionary<CoroutineHandle, string>();
 
@@ -236,8 +220,6 @@ namespace aeric.coroutinery
 
         private void RunTimersAndCustomYields()
         {
-
-
             foreach (var c in _coroutines)
             {
                 //if a coroutine is paused then exit early
@@ -309,7 +291,7 @@ namespace aeric.coroutinery
         {
             foreach (var co in _coroutines)
             {
-                if (co._runPhase == phase)
+                if (co._runPhase == phase && !co._paused)
                 {
                     RunCoroutineStep(co, phase);
                 }
@@ -334,7 +316,10 @@ namespace aeric.coroutinery
 
         private void RunCoroutineStep(CoroutineData coroutine, RunPhase phase)
         {
+            AericLog($"Coroutine Step: {coroutine} in phase {phase}");
+
             IEnumerator co = coroutine._enumerator;
+
 
             //Only call MoveNext is the coroutine is in the active state
             if (coroutine._state != CoroutineState.Running)
@@ -428,7 +413,7 @@ namespace aeric.coroutinery
 
             if (BreakOnFinished)
             {
-                Debug.Log("Coroutine Finished: " + coroutine.ToString());
+                AericLog("Coroutine Finished: " + coroutine.ToString());
                 Debug.Break();
             }
 
@@ -442,6 +427,12 @@ namespace aeric.coroutinery
                     RunCoroutineStep(co, RunPhase.Update);
                 }
             }
+        }
+
+        [Conditional("NOT_DISABLE_AERIC_LOGS")]
+        private void AericLog(string v)
+        {
+            if (LogSteps) Debug.Log(v);
         }
 
         public void RunEndOfFrame()
@@ -511,16 +502,18 @@ namespace aeric.coroutinery
             return coroutineHandle;
         }
 
-        public void StopCoroutine(CoroutineHandle handle)
+        public void StopCoroutine(CoroutineHandle handle, bool stopChild = true)
         {
-            foreach (var c in _coroutines)
+            if (CoroutineIsOnKillList(handle)) return;
+            var c = GetCoroutineByHandle(handle);
+            if (c == null) return;
+
+            if (stopChild && c._state == CoroutineState.Waiting_Coroutine)
             {
-                if (c._handle._id == handle._id)
-                {
-                    StopCoroutineInternal(c);
-                    break;
-                }
+                StopCoroutine(new CoroutineHandle(c._waitCoroutineId));
             }
+
+            StopCoroutineInternal(c);
         }
 
         private void StopCoroutineInternal(CoroutineData coroutine)
@@ -640,14 +633,14 @@ namespace aeric.coroutinery
             return false;
         }
 
-        public void PauseCoroutine(CoroutineHandle handle)
+        public void PauseCoroutine(CoroutineHandle handle, bool pauseChild = true)
         {
             if (CoroutineIsOnKillList(handle)) return;
-
             var c = GetCoroutineByHandle(handle);
+            if (c == null) return;
 
             //if this coroutine is waiting on another coroutine then pause that one too
-            if (c._state == CoroutineState.Waiting_Coroutine)
+            if (pauseChild && c._state == CoroutineState.Waiting_Coroutine)
             {
                 PauseCoroutine(new CoroutineHandle(c._waitCoroutineId));
             }
@@ -674,7 +667,7 @@ namespace aeric.coroutinery
             PauseCoroutines(GetCoroutinesByContextNoCopy(context));
         }
 
-        public void ResumeCoroutine(CoroutineHandle handle) 
+        public void ResumeCoroutine(CoroutineHandle handle, bool resumeChild = true) 
         {
             CoroutineData c = GetCoroutineByHandle(handle);
             if (c == null) return;//TODO: error
@@ -683,7 +676,7 @@ namespace aeric.coroutinery
             c._paused = false;
 
             //if this coroutine is waiting on another coroutine then resume that one too
-            if (c._state == CoroutineState.Waiting_Coroutine)
+            if (resumeChild && c._state == CoroutineState.Waiting_Coroutine)
             {
                 ResumeCoroutine(new CoroutineHandle(c._waitCoroutineId));
             }
