@@ -1,4 +1,4 @@
-//#define DISABLE_AERIC_LOGS //define this to remove all logs from builds
+#define DISABLE_AERIC_LOGS //define this to remove all logs from builds
 #if !DISABLE_AERIC_LOGS
 #define NOT_DISABLE_AERIC_LOGS
 #endif
@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
@@ -484,8 +485,8 @@ namespace aeric.coroutinery
             //TODO: store the stack trace for debugging
             if (Application.isEditor)
             {
-                var stackTrace = Environment.StackTrace;
-                _stackTrace[coroutineHandle] = stackTrace;
+           //     var stackTrace = Environment.StackTrace;
+            //    _stackTrace[coroutineHandle] = stackTrace;
             }
 
             //TODO: context, tag, layer
@@ -822,7 +823,7 @@ namespace aeric.coroutinery
             }
         }
 
-        public SourceInfo GetCoroutineDebugInfo(CoroutineHandle coroutineHandle, CoroutineDebugInfo d)
+        public SourceInfo GetCoroutineSourceInfo(CoroutineHandle coroutineHandle, CoroutineDebugInfo d)
         {
           //  string debugInfo = string.Empty;
             CoroutineData coroutine = GetCoroutineByHandle(coroutineHandle);
@@ -868,7 +869,7 @@ namespace aeric.coroutinery
                 }
             }
 
-            SourceInfo coroutineDebug = GetCoroutineDebugInfo(coroutine, debugInfo);
+            SourceInfo coroutineDebug = GetCoroutineSourceInfo(coroutine, debugInfo);
 
             //extract the method name from the enumerator type name  
             string methodName = string.Empty;
@@ -931,7 +932,7 @@ namespace aeric.coroutinery
             return stack;
         }
 
-        private CoroutineHandle GetCoroutineChild(CoroutineHandle currentHandle)
+        public CoroutineHandle GetCoroutineChild(CoroutineHandle currentHandle)
         {
             CoroutineData c = GetCoroutineByHandle(currentHandle);
             if (c == null) return CoroutineHandle.InvalidHandle;
@@ -942,7 +943,7 @@ namespace aeric.coroutinery
             return CoroutineHandle.InvalidHandle;
         }
 
-        private CoroutineHandle GetCoroutineParent(CoroutineHandle currentHandle)
+        public CoroutineHandle GetCoroutineParent(CoroutineHandle currentHandle)
         {
             foreach(var c in _coroutines)
             {
@@ -954,5 +955,19 @@ namespace aeric.coroutinery
 
             return CoroutineHandle.InvalidHandle;
         }
+
+#if UNITY_EDITOR
+        public static CoroutineDebugInfo LoadDebugInfo()
+        {
+            //Find the debug info object
+            string[] debugAssets = AssetDatabase.FindAssets("t:CoroutineDebugInfo");
+            string guid = debugAssets[0];
+            Debug.LogError(guid);
+
+            //get the asset path from its guid
+            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            return AssetDatabase.LoadAssetAtPath<CoroutineDebugInfo>(assetPath);
+        }
+#endif
     }
 }

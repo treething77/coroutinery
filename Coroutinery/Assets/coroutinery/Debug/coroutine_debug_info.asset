@@ -118,8 +118,23 @@ MonoBehaviour:
     - sourceUrl: Assets\coroutinery\Scripts\CoroutineManager.cs
       typeName: <EndOfFrameRunner>d__2
       typeNamespace: aeric.coroutinery
-      stateSourcePoints: 65000000
+      stateSourcePoints: 66000000
       outerTypeName: CoroutineUpdater
+    - sourceUrl: Assets\coroutinery\Examples\DeepStack\DeepStackTest.cs
+      typeName: <RootCoroutine>d__3
+      typeNamespace: aeric.demos
+      stateSourcePoints: 39000000
+      outerTypeName: DeepStackTest
+    - sourceUrl: Assets\coroutinery\Examples\DeepStack\DeepStackTest.cs
+      typeName: <StackCoroutine>d__5
+      typeNamespace: aeric.demos
+      stateSourcePoints: 450000004a0000004f000000
+      outerTypeName: DeepStackTest
+    - sourceUrl: Assets\coroutinery\Examples\DeepStack\DeepStackTest.cs
+      typeName: <MoveIt>d__6
+      typeNamespace: aeric.demos
+      stateSourcePoints: 53000000590000005f000000
+      outerTypeName: DeepStackTest
     - sourceUrl: Assets\coroutinery\Examples\Emulation\UnityEmulationTest.cs
       typeName: <NestedTest>d__9
       typeNamespace: aeric.demos

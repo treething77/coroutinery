@@ -176,14 +176,7 @@ namespace aeric.coroutinery
 
                     if (_debugInfo == null)
                     {
-                        //Find the debug info object
-                        string[] debugAssets = AssetDatabase.FindAssets("t:CoroutineDebugInfo");
-                        string guid = debugAssets[0];
-                        Debug.LogError(guid);
-
-                        //get the asset path from its guid
-                        var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                        _debugInfo = AssetDatabase.LoadAssetAtPath<CoroutineDebugInfo>(assetPath);
+                        _debugInfo = CoroutineManager.LoadDebugInfo();
                     }
 
                     if (selectedCoroutines.Count > 0)
@@ -474,11 +467,11 @@ namespace aeric.coroutinery
 
         private void DrawCoroutineDetails(List<CoroutineHandle> coroutineHandles, float debugInfoAreaWidth)
         {
-            SourceInfo debugInfo = null;
+            SourceInfo sourceInfo = null;
 
             if (coroutineHandles.Count == 1)
             {
-                debugInfo = CoroutineManager.Instance.GetCoroutineDebugInfo(coroutineHandles[0], _debugInfo);
+                sourceInfo = CoroutineManager.Instance.GetCoroutineSourceInfo(coroutineHandles[0], _debugInfo);
             }
 
  
@@ -625,12 +618,12 @@ namespace aeric.coroutinery
                         var rc = EditorGUILayout.GetControlRect(GUILayout.Height(20));
                         if (rc.Contains(Event.current.mousePosition))
                         {
-                            UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(debugInfo.url, debugInfo.lineNumber);
+                            UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(sourceInfo.url, sourceInfo.lineNumber);
                         }
                     }
 
                     //extract the name between the < and >
-                    string methodName = debugInfo.enumeratorTypeName;
+                    string methodName = sourceInfo.enumeratorTypeName;
                     int start = methodName.IndexOf('<');
                     int end = methodName.IndexOf('>');
                     if (start != -1 && end != -1)
@@ -638,7 +631,7 @@ namespace aeric.coroutinery
                         methodName = methodName.Substring(start + 1, end - start - 1);
                     }
 
-                    EditorGUILayout.LabelField(debugInfo.outerTypeName + "." + methodName + " (" + debugInfo.url + ":" + debugInfo.lineNumber + ")", EditorStyles.textField);
+                    EditorGUILayout.LabelField(sourceInfo.outerTypeName + "." + methodName + " (" + sourceInfo.url + ":" + sourceInfo.lineNumber + ")", EditorStyles.textField);
                 }
             }//end vertical scope
 
