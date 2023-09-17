@@ -1,3 +1,5 @@
+using MEC;
+using NUnit.Framework.Constraints;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -110,7 +112,7 @@ namespace aeric.coroutinery
         bool breakOnFinished = false;
         bool logSteps = false;
 
-        private CoroutineHandle selectedCoroutine = CoroutineHandle.InvalidHandle;
+        private List<CoroutineHandle> selectedCoroutines = new List<CoroutineHandle>();
 
         void OnGUI()
         {
@@ -148,10 +150,10 @@ namespace aeric.coroutinery
 
             float stackAreaHeight = 0.0f;
             List<CoroutineHandle> stackHandles = new List<CoroutineHandle>();
-            if (selectedCoroutine._id != 0)
+            if (selectedCoroutines.Count == 1)
             {
                 //get the coroutine stack
-                stackHandles = CoroutineManager.Instance.GetCoroutineStack(selectedCoroutine);
+                stackHandles = CoroutineManager.Instance.GetCoroutineStack(selectedCoroutines[0]);
             }
 
             //TODO: this isnt right, 30 was just a guess, and we aren't accounting for the label height
@@ -184,17 +186,19 @@ namespace aeric.coroutinery
                         _debugInfo = AssetDatabase.LoadAssetAtPath<CoroutineDebugInfo>(assetPath);
                     }
 
-                    if (selectedCoroutine.IsValid)
+                    if (selectedCoroutines.Count > 0)
                     {
-                        DrawCoroutineDetails(selectedCoroutine, debugInfoAreaWidth);
+                        DrawCoroutineDetails(selectedCoroutines, debugInfoAreaWidth);
                     }
                 }//end scroll view scope
             }//end area scope
 
             //stack area
 
-            if (selectedCoroutine.IsValid)
+            if (selectedCoroutines.Count == 1)
             {
+                var selectedCoroutine = selectedCoroutines[0];
+
                 using (new AreaScope(new Rect(xStart, yStart, debugInfoAreaWidth, stackAreaHeight)))
                 {
                     var dividorRect = EditorGUILayout.GetControlRect(GUILayout.Height(separatorWidth + 4));
@@ -327,11 +331,59 @@ namespace aeric.coroutinery
                                     //check if the mouse is within the scrollview
                                     if (mousePosRelative.x > 0 && mousePosRelative.x < scrollSize.x && mousePosRelative.y > 0 && mousePosRelative.y < scrollSize.y)
                                     {
+                                        //TODO: have to account for the scroll position
+
                                         //get the index of the item that was clicked on
                                         coroutineIndex = (int)(mousePosRelative.y / 20);
                                         if (coroutineIndex >= 0 && coroutineIndex < coroutines.Count)
                                         {
-                                            SetSelectedCoroutine(coroutines[coroutineIndex]);
+                                            //check if ctrl or shift are held down
+                                            if (Event.current.control)
+                                            {
+                                                //add this coroutine to the selection
+                                                if (selectedCoroutines.Contains(coroutines[coroutineIndex]))
+                                                {
+                                                    RemoveSelectedCoroutine(coroutines[coroutineIndex]);
+                                                }
+                                                else
+                                                {
+                                                    AddSelectedCoroutine(coroutines[coroutineIndex]);
+                                                }
+                                            }
+                                            else if (Event.current.shift)
+                                            {
+                                                if (!selectedCoroutines.Contains(coroutines[coroutineIndex]))
+                                                {
+                                                    //calculate the index bounds of the selection set and extend the selection to include this coroutine
+                                                    var lastSelected = selectedCoroutines[selectedCoroutines.Count - 1];
+                                                    int lastIndex = coroutines.IndexOf(lastSelected);
+                                                    if (lastIndex < coroutineIndex)
+                                                    {
+                                                        for (int j = lastIndex + 1; j <= coroutineIndex; j++)
+                                                        {
+                                                            if (!selectedCoroutines.Contains(coroutines[j]))
+                                                            {
+                                                                AddSelectedCoroutine(coroutines[j]);
+                                                            }
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        for (int j = coroutineIndex; j < lastIndex; j++)
+                                                        {
+                                                            if (!selectedCoroutines.Contains(coroutines[j]))
+                                                            {
+                                                                AddSelectedCoroutine(coroutines[j]);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                //no modifier - set this coroutine as the single selection
+                                                SetSelectedCoroutine(coroutines[coroutineIndex]);
+                                            }
                                         }
                                     }
                                 }
@@ -351,7 +403,7 @@ namespace aeric.coroutinery
                                     name = CoroutineManager.Instance.GetCoroutinePrettyName(coroutine, _debugInfo);
 
                                     //highlight the selected coroutine
-                                    if (selectedCoroutine._id == coroutine._id)
+                                    if (selectedCoroutines.Contains(coroutine))
                                     {
                                         EditorGUILayout.LabelField(name, currentStyle);
                                     }
@@ -380,18 +432,31 @@ namespace aeric.coroutinery
                 }//end area scope
             }//end horizontal scope      
         }
+        
 
-        private void SetSelectedCoroutine(CoroutineHandle coroutineHandle)
+        private void AddSelectedCoroutine(CoroutineHandle coroutineHandle)
         {
-            selectedCoroutine = coroutineHandle;
+            selectedCoroutines.Add(coroutineHandle);
             Repaint();
 
             var context = CoroutineManager.Instance.GetCoroutineContext(coroutineHandle);
             if (context is GameObject)
             {
                 //highlight the GameObject
-                Selection.activeGameObject = (GameObject)context;
+             //   Selection.activeGameObject = (GameObject)context;
             }
+        }
+
+        private void RemoveSelectedCoroutine(CoroutineHandle coroutineHandle)
+        {
+            selectedCoroutines.Remove(coroutineHandle);
+            Repaint();
+        }
+
+        private void SetSelectedCoroutine(CoroutineHandle coroutineHandle)
+        {
+            selectedCoroutines.Clear();
+            AddSelectedCoroutine(coroutineHandle);
         }
 
         private Texture2D MakeTex(int width, int height, Color col)
@@ -407,19 +472,30 @@ namespace aeric.coroutinery
             return result;
         }
 
-        private void DrawCoroutineDetails(CoroutineHandle coroutineHandle, float debugInfoAreaWidth)
+        private void DrawCoroutineDetails(List<CoroutineHandle> coroutineHandles, float debugInfoAreaWidth)
         {
-            SourceInfo debugInfo = CoroutineManager.Instance.GetCoroutineDebugInfo(coroutineHandle, _debugInfo);
-            if (debugInfo == null)
+            SourceInfo debugInfo = null;
+
+            if (coroutineHandles.Count == 1)
             {
-                return;
+                debugInfo = CoroutineManager.Instance.GetCoroutineDebugInfo(coroutineHandles[0], _debugInfo);
             }
 
-            IEnumerator c = CoroutineManager.Instance.GetCoroutineEnumerator(coroutineHandle);
-
+ 
             using (new EditorGUILayout.VerticalScope())
             {
-                string prettyName = CoroutineManager.Instance.GetCoroutinePrettyName(coroutineHandle, _debugInfo);
+                string prettyName = string.Empty;
+                
+                if (selectedCoroutines.Count == 1)
+                {
+                    var coroutineHandle = selectedCoroutines[0];
+                    prettyName = CoroutineManager.Instance.GetCoroutinePrettyName(coroutineHandle, _debugInfo);
+                }
+                else
+                {
+                    prettyName = "Multiple Coroutines Selected";
+                }
+                
                 EditorGUILayout.LabelField(prettyName);
 
                 //Status toolbar
@@ -440,7 +516,12 @@ namespace aeric.coroutinery
                 {
                     var t = style.normal.background;
 
-                    bool coroutineIsPaused = CoroutineManager.Instance.GetCoroutinePaused(coroutineHandle);
+                    bool coroutineIsPaused = true;
+
+                    foreach (var co in selectedCoroutines)
+                    {
+                        coroutineIsPaused &= CoroutineManager.Instance.GetCoroutinePaused(co);
+                    }
 
                     style.normal.background = coroutineIsPaused ? t : selectedBG;
 
@@ -449,7 +530,7 @@ namespace aeric.coroutinery
                         //if the coroutine is paused then resume it
                         if (coroutineIsPaused)
                         {
-                            CoroutineManager.Instance.ResumeCoroutine(coroutineHandle);
+                            CoroutineManager.Instance.ResumeCoroutines(coroutineHandles);
                             Repaint();
                         }
                     }
@@ -459,7 +540,7 @@ namespace aeric.coroutinery
                     if (GUILayout.Button(stopicon, style, GUILayout.MaxWidth(buttonSize + 6)))
                     {
                         //kill this coroutine
-                        CoroutineManager.Instance.StopCoroutine(coroutineHandle);
+                        CoroutineManager.Instance.StopCoroutines(coroutineHandles);
                         Repaint();
                     }
 
@@ -470,7 +551,7 @@ namespace aeric.coroutinery
                         //if the coroutine is not paused then pause it
                         if (!coroutineIsPaused)
                         {
-                            CoroutineManager.Instance.PauseCoroutine(coroutineHandle);
+                            CoroutineManager.Instance.PauseCoroutines(coroutineHandles);
                             Repaint();
                         }
                     }
@@ -478,14 +559,21 @@ namespace aeric.coroutinery
 
                 //end status toolbar
 
-                Rect dividorRect = EditorGUILayout.GetControlRect(GUILayout.Height(2 + 4));
-                dividorRect = new Rect(0, dividorRect.y + 2, debugInfoAreaWidth, 1);
-                DrawDividor(dividorRect);
-
-                //what is the coroutine waiting on?
-                if (c.Current != null)
+                if (coroutineHandles.Count == 1)
                 {
-                    if ((c.Current is WaitForSeconds) || (c.Current is WaitForSecondsRealtime))
+                    var coroutineHandle = coroutineHandles[0];
+                    IEnumerator c = CoroutineManager.Instance.GetCoroutineEnumerator(coroutineHandle);
+
+                    Rect dividorRect = EditorGUILayout.GetControlRect(GUILayout.Height(2 + 4));
+                    dividorRect = new Rect(0, dividorRect.y + 2, debugInfoAreaWidth, 1);
+                    DrawDividor(dividorRect);
+
+                    //what is the coroutine waiting on?
+                    if (c.Current == null)
+                    {
+                        EditorGUILayout.LabelField("Waiting on: nothing");
+                    }
+                    else if ((c.Current is WaitForSeconds) || (c.Current is WaitForSecondsRealtime))
                     {
                         EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
                         //need to ask the coroutine manager for the time remaining
@@ -523,144 +611,145 @@ namespace aeric.coroutinery
                             }
                         }//end horizontal scope
                     }
-                }
-
-                //draw dividor
-                dividorRect = EditorGUILayout.GetControlRect(GUILayout.Height(2 + 4));
-                dividorRect = new Rect(0, dividorRect.y + 2, debugInfoAreaWidth, 1);
-                DrawDividor(dividorRect);
-
-
-                EditorGUILayout.LabelField("Current State:");
-
-                if (Event.current.type == EventType.MouseDown && Event.current.clickCount == 2)
-                {
-                    var rc = EditorGUILayout.GetControlRect(GUILayout.Height(20));
-                    if (rc.Contains(Event.current.mousePosition))
-                    {
-                        UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(debugInfo.url, debugInfo.lineNumber);
-                    }
-                }
-
-                //extract the name between the < and >
-                string methodName = debugInfo.enumeratorTypeName;
-                int start = methodName.IndexOf('<');
-                int end = methodName.IndexOf('>');
-                if (start != -1 && end != -1)
-                {
-                    methodName = methodName.Substring(start + 1, end - start - 1);
-                }
-
-                EditorGUILayout.LabelField(debugInfo.outerTypeName + "." + methodName + " (" + debugInfo.url + ":" + debugInfo.lineNumber + ")", EditorStyles.textField);
-
-            }//end vertical scope
+                
+                    //draw dividor
+                    dividorRect = EditorGUILayout.GetControlRect(GUILayout.Height(2 + 4));
+                    dividorRect = new Rect(0, dividorRect.y + 2, debugInfoAreaWidth, 1);
+                    DrawDividor(dividorRect);
 
 
-            string stackTrace = CoroutineManager.Instance.GetStackTrace(coroutineHandle);
-            string[] lines = stackTrace.Split('\n');
-
-            //Find the first line in the stack that is not in aeric library code
-                        
-
-            //" at aeric."
-
-            //split stackTrace into lines
-            //get the first line that does not contain "aeric.coroutinery.CoroutineManager"
-            int index = 1;
-
-            //Find the line containing the StartCoroutine call
-            while (index < lines.Length)
-            {
-                if (lines[index-1].Contains(".StartCoroutine"))
-                {
-                    break;
-                }
-                index++;
-            }
-
-            //show the top 3 lines of the stack
-            using (new EditorGUILayout.VerticalScope())
-            {
-                EditorGUILayout.LabelField("Started from:");
-
-                int i = 0;
-                Texture2D stackPtrIcon = LoadCachedTexture(IconPath_StackPtr);
-
-                int stackLinesToShow = 3;
-                int stackLinesShown = 0;
-                while (stackLinesShown < stackLinesToShow && index < lines.Length)
-                {
-                    //extract the source file and line number
-                    string sourceLine = lines[index];
-
-                    //every line starts with " at "
-                    sourceLine = sourceLine.Substring(5);
-                    //the next space will be the end of the method name
-                    int methodEnd = sourceLine.IndexOf(" ");
-                    //extract the method name
-
-                    string methodName = sourceLine.Substring(0, methodEnd);
-
-                    //split by '.'
-                    string[] methodParts = methodName.Split('.');
-                    //the last part will be the method name
-                    methodName = methodParts[methodParts.Length - 1];
-
-                    string className = methodParts[methodParts.Length - 2];
-
-                    methodName = className;
-                    var start = methodName.IndexOf('<');
-                    var end = methodName.IndexOf('>');
-                    if (start != -1 && end != -1)
-                    {
-                        methodName = methodName.Substring(start + 1, end - start - 1);
-                    }
-
-                    start = className.IndexOf('+');
-                    if (start != -1)
-                    {
-                        className = className.Substring(0, start);
-                    }
-
-                    string callSite = className + "." + methodName;
-
-                    int fileStart = sourceLine.IndexOf("] in ") + 5;
-                    int fileEnd = sourceLine.LastIndexOf(":");
-
-                    string sourceFile = sourceLine.Substring(fileStart, fileEnd - fileStart);
-
-                    sourceFile = sourceFile.Substring(sourceFile.IndexOf("Assets"));
-
-                    string sourceLineNumberStr = sourceLine.Substring(fileEnd + 1, sourceLine.Length - fileEnd - 1);
-                    int sourceLineNumber = int.Parse(sourceLineNumberStr);
+                    EditorGUILayout.LabelField("Current State:");
 
                     if (Event.current.type == EventType.MouseDown && Event.current.clickCount == 2)
                     {
                         var rc = EditorGUILayout.GetControlRect(GUILayout.Height(20));
                         if (rc.Contains(Event.current.mousePosition))
                         {
-                            UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(sourceFile, sourceLineNumber);
+                            UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(debugInfo.url, debugInfo.lineNumber);
                         }
                     }
 
-                    using (new EditorGUILayout.HorizontalScope())
+                    //extract the name between the < and >
+                    string methodName = debugInfo.enumeratorTypeName;
+                    int start = methodName.IndexOf('<');
+                    int end = methodName.IndexOf('>');
+                    if (start != -1 && end != -1)
                     {
-                        if (i > 1)
-                            GUILayout.Space(indent * (i - 1));
+                        methodName = methodName.Substring(start + 1, end - start - 1);
+                    }
 
-                        if (i > 0)
-                            GUILayout.Label(stackPtrIcon, GUILayout.Width(20), GUILayout.Height(20));
-
-                        EditorGUILayout.LabelField(callSite + " (" + sourceFile + ":" + sourceLineNumber + ")", EditorStyles.textField);
-                    }//end horizontal scope
-
-                    i++;
-
-                    index++;
-                    stackLinesShown++;
+                    EditorGUILayout.LabelField(debugInfo.outerTypeName + "." + methodName + " (" + debugInfo.url + ":" + debugInfo.lineNumber + ")", EditorStyles.textField);
                 }
-            }//end vertical scope 
-            
+            }//end vertical scope
+
+            if (coroutineHandles.Count == 1)
+            {
+                var coroutineHandle = coroutineHandles[0];
+                string stackTrace = CoroutineManager.Instance.GetStackTrace(coroutineHandle);
+                string[] lines = stackTrace.Split('\n');
+
+                //Find the first line in the stack that is not in aeric library code
+
+
+                //" at aeric."
+
+                //split stackTrace into lines
+                //get the first line that does not contain "aeric.coroutinery.CoroutineManager"
+                int index = 1;
+
+                //Find the line containing the StartCoroutine call
+                while (index < lines.Length)
+                {
+                    if (lines[index - 1].Contains(".StartCoroutine"))
+                    {
+                        break;
+                    }
+                    index++;
+                }
+
+                //show the top 3 lines of the stack
+                using (new EditorGUILayout.VerticalScope())
+                {
+                    EditorGUILayout.LabelField("Started from:");
+
+                    int i = 0;
+                    Texture2D stackPtrIcon = LoadCachedTexture(IconPath_StackPtr);
+
+                    int stackLinesToShow = 3;
+                    int stackLinesShown = 0;
+                    while (stackLinesShown < stackLinesToShow && index < lines.Length)
+                    {
+                        //extract the source file and line number
+                        string sourceLine = lines[index];
+
+                        //every line starts with " at "
+                        sourceLine = sourceLine.Substring(5);
+                        //the next space will be the end of the method name
+                        int methodEnd = sourceLine.IndexOf(" ");
+                        //extract the method name
+
+                        string methodName = sourceLine.Substring(0, methodEnd);
+
+                        //split by '.'
+                        string[] methodParts = methodName.Split('.');
+                        //the last part will be the method name
+                        methodName = methodParts[methodParts.Length - 1];
+
+                        string className = methodParts[methodParts.Length - 2];
+
+                        methodName = className;
+                        var start = methodName.IndexOf('<');
+                        var end = methodName.IndexOf('>');
+                        if (start != -1 && end != -1)
+                        {
+                            methodName = methodName.Substring(start + 1, end - start - 1);
+                        }
+
+                        start = className.IndexOf('+');
+                        if (start != -1)
+                        {
+                            className = className.Substring(0, start);
+                        }
+
+                        string callSite = className + "." + methodName;
+
+                        int fileStart = sourceLine.IndexOf("] in ") + 5;
+                        int fileEnd = sourceLine.LastIndexOf(":");
+
+                        string sourceFile = sourceLine.Substring(fileStart, fileEnd - fileStart);
+
+                        sourceFile = sourceFile.Substring(sourceFile.IndexOf("Assets"));
+
+                        string sourceLineNumberStr = sourceLine.Substring(fileEnd + 1, sourceLine.Length - fileEnd - 1);
+                        int sourceLineNumber = int.Parse(sourceLineNumberStr);
+
+                        if (Event.current.type == EventType.MouseDown && Event.current.clickCount == 2)
+                        {
+                            var rc = EditorGUILayout.GetControlRect(GUILayout.Height(20));
+                            if (rc.Contains(Event.current.mousePosition))
+                            {
+                                UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(sourceFile, sourceLineNumber);
+                            }
+                        }
+
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            if (i > 1)
+                                GUILayout.Space(indent * (i - 1));
+
+                            if (i > 0)
+                                GUILayout.Label(stackPtrIcon, GUILayout.Width(20), GUILayout.Height(20));
+
+                            EditorGUILayout.LabelField(callSite + " (" + sourceFile + ":" + sourceLineNumber + ")", EditorStyles.textField);
+                        }//end horizontal scope
+
+                        i++;
+
+                        index++;
+                        stackLinesShown++;
+                    }
+                }//end vertical scope 
+            }
         }
 
         private void ContextFilterOptions()
