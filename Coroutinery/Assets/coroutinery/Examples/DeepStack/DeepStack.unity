@@ -573,6 +573,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63eb3248905a8e44d97f64ee2ff236fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  coroutineDebugInfo: {fileID: 11400000, guid: f168817a53bbe6a48a526aa2935e389f, type: 2}
 --- !u!1 &884402834
 GameObject:
   m_ObjectHideFlags: 0

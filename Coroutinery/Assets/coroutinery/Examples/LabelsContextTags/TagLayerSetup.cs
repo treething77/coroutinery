@@ -82,7 +82,7 @@ namespace aeric.demos
             while (time < 2.0f)
             {
                 gameObject.transform.localRotation *= Quaternion.Euler(0, 5, 0);
-                yield return new WaitForSeconds(0.5f);
+                yield return null;
                 time += Time.deltaTime;
             }
         }

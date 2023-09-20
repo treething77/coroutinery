@@ -24,17 +24,9 @@ namespace aeric.demos
             var nestedCoroutine = NestedTest();
 
             if (useCoroutinery)
-                StartCoroutine(nestedCoroutine);
+                this.BeginCoroutine(nestedCoroutine);
             else
                 base.StartCoroutine(nestedCoroutine);
-        }
-
-        //All the code needed to convert from regular Unity coroutines to Coroutinery coroutines
-        private new IEnumerator StartCoroutine(IEnumerator cocoForCoroutines)
-        {
-            var handle = CoroutineManager.StartCoroutine(cocoForCoroutines);
-            CoroutineManager.Instance.SetCoroutineContext(handle, this.gameObject);
-            return cocoForCoroutines;
         }
 
         private void RecordTiming(string label)
@@ -50,7 +42,7 @@ namespace aeric.demos
         public IEnumerator NestedTest()
         {
             if (useCoroutinery)
-                yield return StartCoroutine(BreakTest());
+                yield return this.BeginCoroutine(BreakTest());
             else
                 yield return base.StartCoroutine(BreakTest());
             
@@ -62,14 +54,14 @@ namespace aeric.demos
             RecordTiming("1b");
 
             if (useCoroutinery)
-                yield return StartCoroutine(MoveIt());
+                yield return this.BeginCoroutine(MoveIt());
             else
                 yield return MoveIt();
 
             RecordTiming("2a");
 
             if (useCoroutinery)
-                yield return StartCoroutine(SpinIt());
+                yield return this.BeginCoroutine(SpinIt());
             else
                 yield return base.StartCoroutine(SpinIt());
 

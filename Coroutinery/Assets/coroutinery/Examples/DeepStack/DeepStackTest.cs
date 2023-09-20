@@ -5,34 +5,40 @@ using UnityEngine;
 
 namespace aeric.demos
 {
+    public static class StartHelper
+    {
+
+        public static IEnumerator BeginCoroutine(this MonoBehaviour monoBehaviour, IEnumerator cocoForCoroutines)
+        {
+            var handle = CoroutineManager.StartCoroutine(cocoForCoroutines);
+            CoroutineManager.Instance.SetCoroutineContext(handle, monoBehaviour.gameObject);
+            return cocoForCoroutines;
+        }
+    }
+
     public class DeepStackTest : MonoBehaviour
     {
         private CoroutineHandle rootCoroutineHandle;
+
+        public CoroutineDebugInfo coroutineDebugInfo;
 
         public void Start()
         {
             //Start a coroutine that creates a deep stack.
             //Wait for the leaf coroutine to end, and the stack to unwind.
             //Then start the coroutine again.
-
             rootCoroutineHandle = CoroutineManager.StartCoroutine(RootCoroutine());
         }
 
         public void LogStackStatus()
         {
-#if UNITY_EDITOR
-            var debugInfo = CoroutineManager.LoadDebugInfo();
-#else
-            CoroutineDebugInfo debugInfo = null;
-#endif
-
             CoroutineHandle coroutineHandle = rootCoroutineHandle;
             StringBuilder sb = new StringBuilder();
             string indentation = "";
 
             while (coroutineHandle.IsValid)
             {             
-                string prettyName = CoroutineManager.Instance.GetCoroutinePrettyName(coroutineHandle, debugInfo);
+                string prettyName = CoroutineManager.Instance.GetCoroutinePrettyName(coroutineHandle, coroutineDebugInfo);
 
                 sb.AppendLine(indentation + prettyName);
 
@@ -52,30 +58,24 @@ namespace aeric.demos
 
                 //Start a coroutine that creates a deep stack to a semi-random depth
                 int stackDepth = Random.Range(1, 100);
-                yield return StartCoroutine(StackCoroutine(0, stackDepth));
+                yield return this.BeginCoroutine(StackCoroutine(0, stackDepth));
                 
                 Debug.Log("RootCoroutine: Stack coroutine ended.");
             }
         }
 
-        private new IEnumerator StartCoroutine(IEnumerator cocoForCoroutines)
-        {
-            var handle = CoroutineManager.StartCoroutine(cocoForCoroutines);
-            CoroutineManager.Instance.SetCoroutineContext(handle, this.gameObject);
-            return cocoForCoroutines;
-        }
 
         public IEnumerator StackCoroutine(int depth, int maxDepth)
         {
             if (depth < maxDepth)
             {
                 //Start a coroutine that creates a deep stack.
-                yield return StartCoroutine(StackCoroutine(depth + 1, maxDepth));
+                yield return this.BeginCoroutine(StackCoroutine(depth + 1, maxDepth));
             }
             else
             {
                 //Start a coroutine that moves the object up and down.
-                yield return StartCoroutine(MoveIt());
+                yield return this.BeginCoroutine(MoveIt());
             }
         }
 
