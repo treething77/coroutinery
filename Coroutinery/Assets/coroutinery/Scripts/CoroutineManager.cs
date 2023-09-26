@@ -625,6 +625,23 @@ namespace aeric.coroutinery
             return _context[context];
         }
 
+        public List<CoroutineHandle> GetCoroutinesByName(string search, CoroutineDebugInfo debugInfo)
+        {
+            string lwrSearch = search.ToLower();
+
+            List<CoroutineHandle> coroutines = new List<CoroutineHandle>();
+            foreach (var c in _coroutines)
+            {
+                string prettyName = GetCoroutinePrettyName(c._handle, debugInfo).ToLower();
+
+                if (prettyName.Contains(lwrSearch))
+                {
+                    coroutines.Add(c._handle);
+                }
+            }
+            return coroutines;
+        }
+
         private bool CoroutineIsOnKillList(CoroutineHandle handle)
         {
             foreach(var c in _killList)
@@ -968,6 +985,31 @@ namespace aeric.coroutinery
             var assetPath = AssetDatabase.GUIDToAssetPath(guid);
             return AssetDatabase.LoadAssetAtPath<CoroutineDebugInfo>(assetPath);
         }
+
+        internal void StopAllCoroutinesWithContext(GameObject gameObject)
+        {
+            var c = GetCoroutinesByContext(gameObject);
+            StopCoroutines(c);
+        }
+
+        public void DestroyGameObjectWithCoroutines(GameObject gameObject)
+        {
+            StopAllCoroutinesWithContext(gameObject);
+            Object.Destroy(gameObject);
+        }
+
+        internal void PauseAllCoroutinesWithContext(GameObject gameObject)
+        {
+            var c = GetCoroutinesByContext(gameObject);
+            PauseCoroutines(c);
+        }
+
+        internal void ResumeAllCoroutinesWithContext(GameObject gameObject)
+        {
+            var c = GetCoroutinesByContext(gameObject);
+            ResumeCoroutines(c);
+        }
+
 #endif
     }
 }

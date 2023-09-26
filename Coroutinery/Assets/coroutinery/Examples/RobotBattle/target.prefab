@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6401234692149654767}
   - component: {fileID: 6401234692149654766}
   - component: {fileID: 6401234692149654754}
+  - component: {fileID: 7851742519076173042}
   m_Layer: 0
   m_Name: target
   m_TagString: Untagged
@@ -111,13 +112,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 157a53c4652a1a84e87fac8f469a8d07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: 0
   CapturedTeamIndex: 0
   captureIndicatorTimer: 0
   captureVFX: {fileID: 8690590316251132357}
   captureIndicator: {fileID: 0}
   _vfxMaterialBlue: {fileID: 2100000, guid: 251c710ec45245f46b9ae709ba8e6242, type: 2}
   _vfxMaterialRed: {fileID: 2100000, guid: a01ca6420c69d84459edc0589dad3460, type: 2}
+--- !u!114 &7851742519076173042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6401234692149654765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8170fa6cec25419ba4ae0d3d6d64e883, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &3333204914536934524
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -173,7 +185,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2300349871183612058, guid: 20454d685af2d594eb50abba39a4e4cb, type: 3}
+    - {fileID: 1373822709192919797, guid: 20454d685af2d594eb50abba39a4e4cb, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 20454d685af2d594eb50abba39a4e4cb, type: 3}
 --- !u!198 &8690590316251132357 stripped
 ParticleSystem:

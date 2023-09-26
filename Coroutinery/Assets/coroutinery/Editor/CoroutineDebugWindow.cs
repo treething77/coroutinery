@@ -5,7 +5,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Experimental;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 namespace aeric.coroutinery
 {
@@ -91,12 +93,12 @@ namespace aeric.coroutinery
 
         enum FilterMode
         {
+            FILTER_NAME,
+            FILTER_CONTEXT,
             FILTER_TAG,
-            FILTER_LAYER,
-            FILTER_CONTEXT
         }
 
-        FilterMode filterMode = FilterMode.FILTER_TAG;
+        FilterMode filterMode = FilterMode.FILTER_NAME;
 
         CoroutineDebugInfo _debugInfo = null;
 
@@ -143,6 +145,21 @@ namespace aeric.coroutinery
             }
             //call ongui again on a timer
             //  Repaint();
+        }
+
+        string search = string.Empty;
+
+        bool cleared = false;
+
+        internal GUIStyle GetGUIStyle(string styleName)
+        {
+            GUIStyle gUIStyle = GUI.skin.FindStyle(styleName) ?? EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector).FindStyle(styleName);
+            if (gUIStyle == null)
+            {
+                Debug.LogError("Missing built-in guistyle " + styleName);
+            }
+
+            return gUIStyle;
         }
 
         private void DrawRightPane(float windowWidth, float windowHeight)
@@ -248,28 +265,57 @@ namespace aeric.coroutinery
             {
                 using (new AreaScope(new Rect(0, 0, leftPaneWidth, windowHeight)))
                 {
-                    using (new EditorGUILayout.VerticalScope())
+                    using (new EditorGUILayout.HorizontalScope())
                     {
                         //TODO: string constants
-                        EditorGUILayout.LabelField("Filter");
+                        EditorGUILayout.LabelField("Filter:", EditorStyles.label, GUILayout.MaxWidth(leftPaneWidth * 0.2f));
 
-                        string[] tabOptions = new string[] { "Tag", "Layer", "Selection" };
+                        string[] tabOptions = new string[] { "Name", "Selection", "Tag" };
 
-                        filterMode = (FilterMode)GUILayout.Toolbar((int)filterMode, tabOptions);
-                        //TODO: set editor pref for mode
+                        filterMode = (FilterMode)GUILayout.Toolbar((int)filterMode, tabOptions, GUILayout.MaxWidth(leftPaneWidth * 0.8f));
+                    }
 
-                        switch (filterMode)
+                    using (new EditorGUILayout.VerticalScope())
+                    {
+                        //This is a lot of work to get a search field with a cancel button
+                        //This is because Unity keeps certain minor elements as internal, so we have to recreate or workaround them
+
+                        //TODO: cache these
+                        GUIStyle cancelButtonStyle = GetGUIStyle("SearchCancelButton");
+                        GUIStyle emptyCancelButtonStyle = GetGUIStyle("SearchCancelButtonEmpty");
+                        float fixedWidth = cancelButtonStyle.fixedWidth;
+
+                        float kLabelFloatMaxW = EditorGUIUtility.labelWidth + EditorGUIUtility.fieldWidth + 5f;
+                        Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.fieldWidth, kLabelFloatMaxW, 18, 18, EditorStyles.toolbarSearchField);
+                        rect.width -= fixedWidth;
+
+                        bool empty = string.IsNullOrEmpty(search);
+
+                        Rect position = rect;
+                        position.x += rect.width;
+                        position.width = fixedWidth;
+
+                        GUI.SetNextControlName("coroutinerysearchfield");
+
+                        //TODO: different search text per mode
+                        search = EditorGUI.TextField(rect, search, EditorStyles.toolbarSearchField);
+
+                        GUI.SetNextControlName("searchcancelbutton");
+                        if (GUI.Button(position, GUIContent.none, !empty ? cancelButtonStyle : emptyCancelButtonStyle))
                         {
-                            case FilterMode.FILTER_TAG:
-                                TagFilterOptions();
-                                break;
-                            case FilterMode.FILTER_LAYER:
-                                LayerFilterOptions();
-                                break;
-                            case FilterMode.FILTER_CONTEXT:
-                                ContextFilterOptions();
-                                break;
+                            search = string.Empty;
+                            //If we don't change focus then the text field doesn't actually clear
+                            GUI.FocusControl("searchcancelbutton");
+
+                            Repaint();
+                            cleared = true;
                         }
+                        else if (cleared)
+                        {
+                            cleared = false;
+                            EditorGUI.FocusTextInControl("coroutinerysearchfield");
+                        }
+
 
                         //TODO: helper for horizontal dividors
                         //draw the dividor
@@ -290,10 +336,13 @@ namespace aeric.coroutinery
                                 switch (filterMode)
                                 {
                                     case FilterMode.FILTER_TAG:
-                                        coroutines = CoroutineManager.Instance.GetCoroutinesByTag(tagFilter.tag);
+                                        coroutines = CoroutineManager.Instance.GetCoroutinesByTag(search);
                                         break;
-                                    case FilterMode.FILTER_LAYER:
-                                        coroutines = CoroutineManager.Instance.GetCoroutinesByLayer(layerFilter.layer);
+                                    case FilterMode.FILTER_NAME:
+                                        //TODO:
+                                        coroutines = CoroutineManager.Instance.GetCoroutinesByName(search, _debugInfo);
+
+                                       // coroutines = CoroutineManager.Instance.GetCoroutinesByLayer(layerFilter.layer);
                                         break;
                                     case FilterMode.FILTER_CONTEXT:
                                         //get the selected objects from the hierarchy
@@ -302,6 +351,7 @@ namespace aeric.coroutinery
                                         {
                                             coroutines.AddRange(CoroutineManager.Instance.GetCoroutinesByContext(go));
                                         }
+                                        //then filter that by name?
                                         break;
                                 }
 
@@ -327,7 +377,7 @@ namespace aeric.coroutinery
                                         //TODO: have to account for the scroll position
 
                                         //get the index of the item that was clicked on
-                                        coroutineIndex = (int)(mousePosRelative.y / 20);
+                                        coroutineIndex = (int)(mousePos.y / 20);
                                         if (coroutineIndex >= 0 && coroutineIndex < coroutines.Count)
                                         {
                                             //check if ctrl or shift are held down
@@ -556,82 +606,88 @@ namespace aeric.coroutinery
                 {
                     var coroutineHandle = coroutineHandles[0];
                     IEnumerator c = CoroutineManager.Instance.GetCoroutineEnumerator(coroutineHandle);
+                    if (c == null)
+                    {
+                        RemoveSelectedCoroutine(coroutineHandle);
+                    }
+                    else
+                    {
+                        Rect dividorRect = EditorGUILayout.GetControlRect(GUILayout.Height(2 + 4));
+                        dividorRect = new Rect(0, dividorRect.y + 2, debugInfoAreaWidth, 1);
+                        DrawDividor(dividorRect);
 
-                    Rect dividorRect = EditorGUILayout.GetControlRect(GUILayout.Height(2 + 4));
-                    dividorRect = new Rect(0, dividorRect.y + 2, debugInfoAreaWidth, 1);
-                    DrawDividor(dividorRect);
-
-                    //what is the coroutine waiting on?
-                    if (c.Current == null)
-                    {
-                        EditorGUILayout.LabelField("Waiting on: nothing");
-                    }
-                    else if ((c.Current is WaitForSeconds) || (c.Current is WaitForSecondsRealtime))
-                    {
-                        EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
-                        //need to ask the coroutine manager for the time remaining
-                        float remaining = CoroutineManager.Instance.GetWaitTimeRemaining(coroutineHandle);
-                        EditorGUILayout.LabelField("Time remaining: " + remaining);
-                    }
-                    else if (c.Current is WaitForFrames)
-                    {
-                        EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
-                        var wf = c.Current as WaitForFrames;
-                        EditorGUILayout.LabelField("Frames remaining: " + wf.framesRemaining);
-                    }
-                    else if (c.Current is WaitWhile)
-                    {
-                        EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
-                    }
-                    else if (c.Current is WaitUntil)
-                    {
-                        EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
-                    }
-                    else if (c.Current is IEnumerator)
-                    {
-                        EditorGUILayout.LabelField("Waiting on:");
-                        //get the pretty name for the coroutine we are waiting on
-                        IEnumerator current = c.Current as IEnumerator;
-                        var currentHandle = CoroutineManager.Instance.GetCoroutineHandle(c.Current as IEnumerator);
-                        prettyName = CoroutineManager.Instance.GetCoroutinePrettyName(currentHandle, _debugInfo);
-
-                        using (new EditorGUILayout.HorizontalScope())
+                        //what is the coroutine waiting on?
+                        if (c.Current == null)
                         {
-                            //this is a coroutine so add a button to jump to it
-                            if (GUILayout.Button(prettyName))
-                            {
-                                SetSelectedCoroutine(currentHandle);
-                            }
-                        }//end horizontal scope
-                    }
-                
-                    //draw dividor
-                    dividorRect = EditorGUILayout.GetControlRect(GUILayout.Height(2 + 4));
-                    dividorRect = new Rect(0, dividorRect.y + 2, debugInfoAreaWidth, 1);
-                    DrawDividor(dividorRect);
-
-
-                    EditorGUILayout.LabelField("Current State:");
-
-                    if (Event.current.type == EventType.MouseDown && Event.current.clickCount == 2)
-                    {
-                        var rc = EditorGUILayout.GetControlRect(GUILayout.Height(20));
-                        if (rc.Contains(Event.current.mousePosition))
-                        {
-                            UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(sourceInfo.url, sourceInfo.lineNumber);
+                            EditorGUILayout.LabelField("Waiting on: nothing");
                         }
-                    }
+                        else if ((c.Current is WaitForSeconds) || (c.Current is WaitForSecondsRealtime))
+                        {
+                            EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
+                            //need to ask the coroutine manager for the time remaining
+                            float remaining = CoroutineManager.Instance.GetWaitTimeRemaining(coroutineHandle);
+                            EditorGUILayout.LabelField("Time remaining: " + remaining);
+                        }
+                        else if (c.Current is WaitForFrames)
+                        {
+                            EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
+                            var wf = c.Current as WaitForFrames;
+                            EditorGUILayout.LabelField("Frames remaining: " + wf.framesRemaining);
+                        }
+                        else if (c.Current is WaitWhile)
+                        {
+                            EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
+                        }
+                        else if (c.Current is WaitUntil)
+                        {
+                            EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
+                        }
+                        else if (c.Current is IEnumerator)
+                        {
+                            EditorGUILayout.LabelField("Waiting on:");
+                            //get the pretty name for the coroutine we are waiting on
+                            IEnumerator current = c.Current as IEnumerator;
+                            var currentHandle = CoroutineManager.Instance.GetCoroutineHandle(c.Current as IEnumerator);
+                            prettyName = CoroutineManager.Instance.GetCoroutinePrettyName(currentHandle, _debugInfo);
 
-                    //extract the name between the < and >
-                    string methodName = sourceInfo.enumeratorTypeName;
-                    int start = methodName.IndexOf('<');
-                    int end = methodName.IndexOf('>');
-                    if (start != -1 && end != -1)
-                    {
-                        methodName = methodName.Substring(start + 1, end - start - 1);
-                    }
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                //this is a coroutine so add a button to jump to it
+                                if (GUILayout.Button(prettyName))
+                                {
+                                    SetSelectedCoroutine(currentHandle);
+                                }
+                            }//end horizontal scope
+                        }
 
-                    EditorGUILayout.LabelField(sourceInfo.outerTypeName + "." + methodName + " (" + sourceInfo.url + ":" + sourceInfo.lineNumber + ")", EditorStyles.textField);
+                        //draw dividor
+                        dividorRect = EditorGUILayout.GetControlRect(GUILayout.Height(2 + 4));
+                        dividorRect = new Rect(0, dividorRect.y + 2, debugInfoAreaWidth, 1);
+                        DrawDividor(dividorRect);
+
+
+                        EditorGUILayout.LabelField("Current State:");
+
+                        if (Event.current.type == EventType.MouseDown && Event.current.clickCount == 2)
+                        {
+                            var rc = EditorGUILayout.GetControlRect(GUILayout.Height(20));
+                            if (rc.Contains(Event.current.mousePosition))
+                            {
+                                UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(sourceInfo.url, sourceInfo.lineNumber);
+                            }
+                        }
+
+                        //extract the name between the < and >
+                        string methodName = sourceInfo.enumeratorTypeName;
+                        int start = methodName.IndexOf('<');
+                        int end = methodName.IndexOf('>');
+                        if (start != -1 && end != -1)
+                        {
+                            methodName = methodName.Substring(start + 1, end - start - 1);
+                        }
+
+                        EditorGUILayout.LabelField(sourceInfo.outerTypeName + "." + methodName + " (" + sourceInfo.url + ":" + sourceInfo.lineNumber + ")", EditorStyles.textField);
+                    }
                 }
             }//end vertical scope
 
