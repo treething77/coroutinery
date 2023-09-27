@@ -53,6 +53,7 @@ namespace aeric.coroutinery
         private const string IconPath_Help     = IconPath_Base + "aeric_help.png";
         private const string IconPath_Play     = IconPath_Base + "aeric_play.png";
         private const string IconPath_Stop     = IconPath_Base + "aeric_stop.png";
+        private const string IconPath_Step     = IconPath_Base + "aeric_step.png";
         private const string IconPath_Pause    = IconPath_Base + "aeric_pause.png";
         private const string HelpUrl = "http://aeric.games/rwnd/api/html/index.html";
         private const string WindowTitle = "Coroutine Debugger";
@@ -94,7 +95,6 @@ namespace aeric.coroutinery
         enum FilterMode
         {
             FILTER_NAME,
-            FILTER_CONTEXT,
             FILTER_TAG,
         }
 
@@ -110,7 +110,7 @@ namespace aeric.coroutinery
         Vector2 debugInfoScrollPosition;
         int coroutineIndex;
 
-
+        bool filterOnSelection = false;
         bool breakOnFinished = false;
         bool logSteps = false;
 
@@ -268,11 +268,17 @@ namespace aeric.coroutinery
                     using (new EditorGUILayout.HorizontalScope())
                     {
                         //TODO: string constants
-                        EditorGUILayout.LabelField("Filter:", EditorStyles.label, GUILayout.MaxWidth(leftPaneWidth * 0.2f));
+                        EditorGUILayout.LabelField("Search:", EditorStyles.label, GUILayout.MaxWidth(leftPaneWidth * 0.15f));
 
-                        string[] tabOptions = new string[] { "Name", "Selection", "Tag" };
+                        string[] tabOptions = new string[] { "Name", "Tag" };
 
-                        filterMode = (FilterMode)GUILayout.Toolbar((int)filterMode, tabOptions, GUILayout.MaxWidth(leftPaneWidth * 0.8f));
+                        filterMode = (FilterMode)GUILayout.Toolbar((int)filterMode, tabOptions, GUILayout.MaxWidth(leftPaneWidth * 0.3f));
+
+                        GUILayout.FlexibleSpace();
+
+                        //v/ar st = EditorStyles.label;
+                       // st.alignment = TextAnchor.MiddleRight;
+                        filterOnSelection = EditorGUILayout.ToggleLeft("Selection", filterOnSelection, GUILayout.MaxWidth(leftPaneWidth * 0.3f));
                     }
 
                     using (new EditorGUILayout.VerticalScope())
@@ -339,20 +345,23 @@ namespace aeric.coroutinery
                                         coroutines = CoroutineManager.Instance.GetCoroutinesByTag(search);
                                         break;
                                     case FilterMode.FILTER_NAME:
-                                        //TODO:
                                         coroutines = CoroutineManager.Instance.GetCoroutinesByName(search, _debugInfo);
+                                        break;
+                                }
 
-                                       // coroutines = CoroutineManager.Instance.GetCoroutinesByLayer(layerFilter.layer);
-                                        break;
-                                    case FilterMode.FILTER_CONTEXT:
-                                        //get the selected objects from the hierarchy
-                                        var selectedObjects = Selection.gameObjects;
-                                        foreach (var go in selectedObjects)
-                                        {
-                                            coroutines.AddRange(CoroutineManager.Instance.GetCoroutinesByContext(go));
-                                        }
-                                        //then filter that by name?
-                                        break;
+                                if (filterOnSelection)
+                                { 
+                                    List<CoroutineHandle> selectionCoroutines = new List<CoroutineHandle>();
+
+                                    //get the selected objects from the hierarchy
+                                    var selectedObjects = Selection.gameObjects;
+                                    foreach (var go in selectedObjects)
+                                    {
+                                        selectionCoroutines.AddRange(CoroutineManager.Instance.GetCoroutinesByContext(go));
+                                    }
+
+                                    //filter the coroutines list by the selectionCoroutines list
+                                    coroutines = coroutines.FindAll((CoroutineHandle handle) => { return selectionCoroutines.Contains(handle); });
                                 }
 
                                 //Detect mouse clicks within the scrollview and determine which item in the list was clicked on
@@ -548,6 +557,7 @@ namespace aeric.coroutinery
                 Texture2D stopicon = LoadCachedTexture(IconPath_Stop);
                 Texture2D pauseIcon = LoadCachedTexture(IconPath_Pause);
                 Texture2D selectedBG = LoadCachedTexture(IconPath_Selected);
+                Texture2D stepIcon = LoadCachedTexture(IconPath_Step);
 
                 //Texture2D separatorTexture = MakeTex(1, 1, Color.black);
 
@@ -598,6 +608,22 @@ namespace aeric.coroutinery
                             Repaint();
                         }
                     }
+
+                    style.normal.background = t;
+
+
+                    GUI.enabled = coroutineIsPaused;//step button is disabled unless we are paused
+                    GUIContent content = new GUIContent(stepIcon, "Single-step a coroutine while it is paused");
+
+                    //step button is disabled unless we are paused
+                    if (GUILayout.Button(content, style, GUILayout.MaxWidth(buttonSize + 6)))
+                    {
+                        //run a step of the coroutine
+                        CoroutineManager.Instance.StepCoroutines(coroutineHandles);
+                    }
+
+                    GUI.enabled = true;
+
                 }//end horizontal scope
 
                 //end status toolbar

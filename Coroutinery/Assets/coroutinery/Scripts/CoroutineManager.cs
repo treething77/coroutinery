@@ -1010,6 +1010,16 @@ namespace aeric.coroutinery
             ResumeCoroutines(c);
         }
 
+        public void StepCoroutines(List<CoroutineHandle> coroutineHandles)
+        {
+            foreach(var co in coroutineHandles)
+            {
+                var c = GetCoroutineByHandle(co);
+                if (c == null) continue;
+                RunCoroutineStep(c, RunPhase.Update);
+            }
+        }
+
 #endif
     }
 }
