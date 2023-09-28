@@ -93,6 +93,8 @@ namespace aeric.demos
             Vector3 startPos = obj.transform.localPosition;
             while (true)
             {
+                if (!obj) break;//handle object destruction
+
                 time += Time.deltaTime * 4.0f;
 
                 //use Sin to make the object bob up and down

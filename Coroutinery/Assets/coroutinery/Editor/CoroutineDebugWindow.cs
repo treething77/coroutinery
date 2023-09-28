@@ -3,6 +3,7 @@ using NUnit.Framework.Constraints;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental;
 using UnityEditor.IMGUI.Controls;
@@ -71,6 +72,9 @@ namespace aeric.coroutinery
             wnd.titleContent = new GUIContent(WindowTitle, LoadCachedTexture(IconPath_StackPtr));
             wnd.wantsLessLayoutEvents = false;
             wnd.wantsMouseMove = true;
+            wnd.autoRepaintOnSceneChange = true;
+
+            wnd.lastRepaint = DateTime.Now;
         }
 
         private static Dictionary<string, Texture2D> _textureCache = new Dictionary<string, Texture2D>();
@@ -129,6 +133,45 @@ namespace aeric.coroutinery
             DrawRightPane(windowWidth, windowHeight);
 
             DrawHelpButton(windowWidth);
+
+            Repaint();
+        }
+
+        DateTime lastRepaint;
+        GameObject[] lastSelectedObjectss;
+
+        void Update()
+        {
+            //check for conditions that should cause a repaint
+            if (EditorApplication.isPlaying && (DateTime.Now - lastRepaint).TotalMilliseconds > 1000)
+            {
+                Repaint();
+                lastRepaint = DateTime.Now;
+            }
+
+            //if the selection changed
+            //compare the arrays contents
+            if (lastSelectedObjectss == null)
+            {
+                lastSelectedObjectss = Selection.gameObjects;
+                Repaint();
+            }
+
+            if (lastSelectedObjectss.Length != Selection.gameObjects.Length)
+            {
+                lastSelectedObjectss = Selection.gameObjects;
+                Repaint();
+            }
+            else
+            {
+                var result = lastSelectedObjectss.Except(Selection.gameObjects);
+                if (result.Count() > 0)
+                {
+                    lastSelectedObjectss = Selection.gameObjects;
+                    Repaint();
+                }
+            }
+            
         }
 
         private void DrawHelpButton(float windowWidth)
@@ -440,10 +483,7 @@ namespace aeric.coroutinery
                                     }
                                 }
 
-
                                 //get the editor text color
-
-
                                 var currentStyle = new GUIStyle(GUI.skin.textField);
                                 currentStyle.normal.background = MakeTex(2, 2, new Color(0.2f, 0.3f, 0.4f, 0.5f));//TODO: constant
 
@@ -464,6 +504,11 @@ namespace aeric.coroutinery
                                         EditorGUILayout.LabelField(name, GUI.skin.textField);
                                     }
                                 }
+                            }
+                            else
+                            {
+                                EditorGUILayout.LabelField("Play mode required");
+                                selectedCoroutines.Clear();
                             }
                         }//end scrollview scope
 
@@ -641,7 +686,7 @@ namespace aeric.coroutinery
                         Rect dividorRect = EditorGUILayout.GetControlRect(GUILayout.Height(2 + 4));
                         dividorRect = new Rect(0, dividorRect.y + 2, debugInfoAreaWidth, 1);
                         DrawDividor(dividorRect);
-
+                        
                         //what is the coroutine waiting on?
                         if (c.Current == null)
                         {
@@ -659,6 +704,18 @@ namespace aeric.coroutinery
                             EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
                             var wf = c.Current as WaitForFrames;
                             EditorGUILayout.LabelField("Frames remaining: " + wf.framesRemaining);
+                        }
+                        else if (c.Current is WaitForLateUpdate)
+                        {
+                            EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
+                        }
+                        else if (c.Current is WaitForFixedUpdate)
+                        {
+                            EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
+                        }
+                        else if (c.Current is WaitForEndOfFrame)
+                        {
+                            EditorGUILayout.LabelField("Waiting on: " + c.Current.ToString());
                         }
                         else if (c.Current is WaitWhile)
                         {
