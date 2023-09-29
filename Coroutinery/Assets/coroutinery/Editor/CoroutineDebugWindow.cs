@@ -193,6 +193,7 @@ namespace aeric.coroutinery
         string search = string.Empty;
 
         bool cleared = false;
+        private Vector2 coroutineStackScrollPosition;
 
         internal GUIStyle GetGUIStyle(string styleName)
         {
@@ -216,8 +217,16 @@ namespace aeric.coroutinery
                 stackHandles = CoroutineManager.Instance.GetCoroutineStack(selectedCoroutines[0]);
             }
 
+            int stackCountToShow = Math.Min(stackHandles.Count, 10);
+
             //TODO: this isnt right, 30 was just a guess, and we aren't accounting for the label height
-            stackAreaHeight = (20 * stackHandles.Count) + (separatorWidth + 4) + 2 + 24;
+            float stackHeight = 20 * stackCountToShow;
+            stackAreaHeight = stackHeight + (separatorWidth + 4) + 2 + 24;
+
+            //dont take more than half the area for the coroutine stack
+            stackAreaHeight = Math.Min(stackAreaHeight, windowHeight * 0.5f);
+            stackHeight = stackAreaHeight - (separatorWidth + 4) - 2 - 24;
+
 
             float xStart = leftPaneWidth + separatorWidth;
             float yStart = windowHeight - stackAreaHeight;
@@ -262,35 +271,43 @@ namespace aeric.coroutinery
 
                     EditorGUILayout.LabelField("Coroutine Stack");
 
-                    using (new EditorGUILayout.VerticalScope())
+                    var listScrollViewScope = new EditorGUILayout.ScrollViewScope(coroutineStackScrollPosition, GUILayout.Height(stackHeight), GUILayout.ExpandHeight(false));
+                    using (listScrollViewScope)
                     {
-                        int i = 0;
-                        foreach (var handle in stackHandles)
+                        coroutineStackScrollPosition = listScrollViewScope.scrollPosition;
+
+
+                        using (new EditorGUILayout.VerticalScope())
                         {
-                            using (new EditorGUILayout.HorizontalScope())
+                            int i = 0;
+                            foreach (var handle in stackHandles)
                             {
-                                if (i > 1)
-                                    GUILayout.Space(indent * (i - 1));
-                                if (i > 0)
-                                    GUILayout.Label(stackPtrIcon, GUILayout.Width(20), GUILayout.Height(20));
-
-                                string prettyName = CoroutineManager.Instance.GetCoroutinePrettyName(handle, _debugInfo);
-
-                                GUIStyle style = new GUIStyle(GUI.skin.button);
-                                var t = style.normal.background;
-                                Texture2D selectedBG = LoadCachedTexture(IconPath_Selected);
-
-                                style.normal.background = handle._id == selectedCoroutine._id ? selectedBG : t;
-
-                                if (GUILayout.Button(prettyName, style))
+                                using (new EditorGUILayout.HorizontalScope())
                                 {
-                                    SetSelectedCoroutine(handle);
-                                }
+                                    bool isSelectedCoroutine = (handle._id == selectedCoroutine._id);
+                                  //  if (i > 1)
+                                  //      GUILayout.Space(indent * (i - 1));
+                                    if (isSelectedCoroutine)
+                                        GUILayout.Label(stackPtrIcon, GUILayout.Width(20), GUILayout.Height(20));
 
-                            }//end horizontal scope
-                            i++;
-                        }
-                    }//end vertical scope
+                                    string prettyName = CoroutineManager.Instance.GetCoroutinePrettyName(handle, _debugInfo);
+
+                                    GUIStyle style = new GUIStyle(GUI.skin.button);
+                                    var t = style.normal.background;
+                                    Texture2D selectedBG = LoadCachedTexture(IconPath_Selected);
+
+                                    style.normal.background = isSelectedCoroutine ? selectedBG : t;
+
+                                    if (GUILayout.Button(prettyName, style))
+                                    {
+                                        SetSelectedCoroutine(handle);
+                                    }
+
+                                }//end horizontal scope
+                                i++;
+                            }
+                        }//end vertical scope
+                    }
                 }//end area scope
             }
         }

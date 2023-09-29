@@ -173,7 +173,7 @@ MonoBehaviour:
     - sourceUrl: Assets\coroutinery\Examples\LabelsContextTags\TagLayerSetup.cs
       typeName: <MoveIt>d__7
       typeNamespace: aeric.demos
-      stateSourcePoints: 5b000000680000006b000000
+      stateSourcePoints: 5b0000006a0000006d000000
       outerTypeName: TagLayerSetup
     - sourceUrl: Assets\coroutinery\Examples\Pause\PauseTest.cs
       typeName: <MoveIt>d__4
