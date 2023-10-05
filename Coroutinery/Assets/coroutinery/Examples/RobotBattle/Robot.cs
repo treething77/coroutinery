@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Profiling;
 using UnityEngine.Serialization;
 
 namespace aeric.coroutinery_demos
@@ -136,6 +137,9 @@ namespace aeric.coroutinery_demos
         public AnimationCurve _movementCurve;
 
         private void Move(Vector3 movement) {
+            //begin profile marker
+            Profiler.BeginSample("Move");
+
             //Called from Unity root motion system
             var gravity = Vector3.up * 5.0f;
             var animMove = movement;
@@ -161,6 +165,8 @@ namespace aeric.coroutinery_demos
                     ChooseTarget();
                 }
             }
+            Profiler.EndSample();
+
         }
 
         private void ChooseTarget() {

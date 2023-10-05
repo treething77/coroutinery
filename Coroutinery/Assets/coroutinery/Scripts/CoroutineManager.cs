@@ -3,6 +3,7 @@
 #define NOT_DISABLE_AERIC_LOGS
 #endif
 
+using MEC;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -485,12 +486,17 @@ namespace aeric.coroutinery
             //TODO: store the stack trace for debugging
             if (Application.isEditor)
             {
-           //     var stackTrace = Environment.StackTrace;
-            //    _stackTrace[coroutineHandle] = stackTrace;
+                bool collectStacks = EditorPrefs.GetBool("Coroutinery/Stack Traces", false);
+
+                if (collectStacks)
+                {
+                    var stackTrace = Environment.StackTrace;
+                    _stackTrace[coroutineHandle] = stackTrace;
+                }
             }
 
             //TODO: context, tag, layer
-
+            //TODO: pool these
             CoroutineData coroutineData = new CoroutineData(coroutineHandle, coroutine);
             coroutineData._state = CoroutineState.Running;
             coroutineData._enumerator = coroutine;
@@ -649,6 +655,33 @@ namespace aeric.coroutinery
                 if (c._handle._id == handle._id) return true;
             }
             return false;
+        }
+
+        public void ResetCoroutines(List<CoroutineHandle> coroutines)
+        {
+            foreach (var c in coroutines) ResetCoroutine(c);
+        }
+
+        public void ResetCoroutine(CoroutineHandle handle)
+        {
+            if (CoroutineIsOnKillList(handle)) return;
+            CoroutineData coroutine = GetCoroutineByHandle(handle);
+            if (coroutine == null) return;
+
+            IEnumerator c = coroutine._enumerator;
+
+            //Calling Reset on a coroutine enumerator object directly will raise a NotSupportedException
+            //c._enumerator.Reset();
+
+            //instead we have to modify the internal state
+            Type type = c.GetType();
+            FieldInfo stateField = type.GetField("<>1__state", BindingFlags.NonPublic | BindingFlags.Instance);
+            stateField.SetValue(c, 0);
+
+            FieldInfo currentField = type.GetField("<>2__current", BindingFlags.NonPublic | BindingFlags.Instance);
+            currentField.SetValue(c, null);
+
+            coroutine._state = CoroutineState.Running;
         }
 
         public void PauseCoroutine(CoroutineHandle handle, bool pauseChild = true)
@@ -842,7 +875,6 @@ namespace aeric.coroutinery
 
         public SourceInfo GetCoroutineSourceInfo(CoroutineHandle coroutineHandle, CoroutineDebugInfo d)
         {
-          //  string debugInfo = string.Empty;
             CoroutineData coroutine = GetCoroutineByHandle(coroutineHandle);
             if (coroutine == null) return null;
 
@@ -850,9 +882,6 @@ namespace aeric.coroutinery
             Type typ = c.GetType();
             FieldInfo type = typ.GetField("<>1__state", BindingFlags.NonPublic | BindingFlags.Instance);
             int stateValue = (int)type.GetValue(c);
-
-         //   debugInfo += "State: " + stateValue + "\n";
-
 
             return d.GetSourceInfo(c, stateValue);
         }
@@ -979,7 +1008,6 @@ namespace aeric.coroutinery
             //Find the debug info object
             string[] debugAssets = AssetDatabase.FindAssets("t:CoroutineDebugInfo");
             string guid = debugAssets[0];
-            Debug.LogError(guid);
 
             //get the asset path from its guid
             var assetPath = AssetDatabase.GUIDToAssetPath(guid);

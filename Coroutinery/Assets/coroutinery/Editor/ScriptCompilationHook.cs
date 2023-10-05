@@ -36,6 +36,25 @@ namespace aeric.coroutinery
             }
         }
 
+        //add menu item to enable stack collection
+        [MenuItem("Coroutinery/Stack Traces")]
+        public static void TogglStackCollection()
+        {
+            bool collectStacks = EditorPrefs.GetBool("Coroutinery/Stack Traces", false);
+            collectStacks = !collectStacks;
+            EditorPrefs.SetBool("Coroutinery/Stack Traces", collectStacks);
+            Debug.Log($"Coroutinery: Collect stacks: {collectStacks}");
+        }
+
+        //validate menu item
+        [MenuItem("Coroutinery/Stack Traces", true)]
+        public static bool TogglStackCollectionValidate()
+        {
+            bool collectStacks = EditorPrefs.GetBool("Coroutinery/Stack Traces", false);
+            Menu.SetChecked("Coroutinery/Stack Traces", collectStacks);
+            return true;
+        }
+
         //add menu item to set auto build mappings
         [MenuItem("Coroutinery/Auto build source mappings")]
         public static void ToggleAutoBuildMappings()
