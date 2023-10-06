@@ -109,7 +109,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6401234692149654765}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 157a53c4652a1a84e87fac8f469a8d07, type: 3}
+  m_Script: {fileID: 11500000, guid: 157a53c4652a1a84e87fac8f469a8d08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   CapturedTeamIndex: 0
@@ -127,7 +127,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6401234692149654765}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8170fa6cec25419ba4ae0d3d6d64e883, type: 3}
+  m_Script: {fileID: 11500000, guid: 8170fa6cec25419ba4ae0d3d6d64e884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &3333204914536934524

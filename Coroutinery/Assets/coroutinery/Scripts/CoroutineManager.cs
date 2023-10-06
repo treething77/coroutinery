@@ -482,7 +482,7 @@ namespace aeric.coroutinery
 
             CoroutineHandle coroutineHandle = new CoroutineHandle(_nextId);
 
-            //TODO: store the stack trace for debugging
+#if UNITY_EDITOR
             if (Application.isEditor)
             {
                 bool collectStacks = EditorPrefs.GetBool("Coroutinery/Stack Traces", false);
@@ -493,9 +493,8 @@ namespace aeric.coroutinery
                     _stackTrace[coroutineHandle] = stackTrace;
                 }
             }
+#endif
 
-            //TODO: context, tag, layer
-            //TODO: pool these
             CoroutineData coroutineData = new CoroutineData(coroutineHandle, coroutine);
             coroutineData._state = CoroutineState.Running;
             coroutineData._enumerator = coroutine;
@@ -1012,6 +1011,7 @@ namespace aeric.coroutinery
             var assetPath = AssetDatabase.GUIDToAssetPath(guid);
             return AssetDatabase.LoadAssetAtPath<CoroutineDebugInfo>(assetPath);
         }
+#endif
 
         internal void StopAllCoroutinesWithContext(GameObject gameObject)
         {
@@ -1047,6 +1047,5 @@ namespace aeric.coroutinery
             }
         }
 
-#endif
     }
 }

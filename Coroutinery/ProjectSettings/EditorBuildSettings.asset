@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/coroutinery/Examples/Menu.unity
+    guid: 70073c585f51ec84cac5b7203079102d
+  - enabled: 1
     path: Assets/coroutinery/Examples/Emulation/Emulation.unity
     guid: 2584b83f194e70748bb33574bd27e883
   - enabled: 1
@@ -14,4 +17,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/coroutinery/Examples/LabelsContextTags/LabelsContextTags.unity
     guid: ad474d5f0a782204caa25099188c454d
+  - enabled: 1
+    path: Assets/coroutinery/Examples/RobotBattle/RobotBattle.unity
+    guid: 5675c0a78c4491c4eb181114a96bdc83
+  - enabled: 1
+    path: Assets/coroutinery/Examples/DeepStack/DeepStack.unity
+    guid: a21866e59605e2542bd13531eddf3c9a
   m_configObjects: {}
