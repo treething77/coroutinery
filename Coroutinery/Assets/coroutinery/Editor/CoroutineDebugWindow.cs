@@ -1,36 +1,13 @@
-using MEC;
-using NUnit.Framework.Constraints;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental;
-using UnityEditor.IMGUI.Controls;
 using UnityEngine;
-using static UnityEditor.Progress;
 
 namespace aeric.coroutinery
 {
-    //TODO: move to its own file
-    class AreaScope : GUI.Scope
-    {
-        public AreaScope(Rect rect)
-        {
-            GUILayout.BeginArea(rect);
-        }
-
-        public AreaScope(Rect rect, GUIContent guiContent)
-        {
-            GUILayout.BeginArea(rect, guiContent);
-        }
-
-        protected override void CloseScope()
-        {
-            GUILayout.EndArea();            
-        }
-    }
-
     public class CoroutineDebugWindow : EditorWindow
     {
         private const string IconPath_Base     = "Assets/coroutinery/Editor/Resources/";
@@ -44,6 +21,7 @@ namespace aeric.coroutinery
         private const string IconPath_Reset    = IconPath_Base + "aeric_reset.png";
         private const string HelpUrl = "http://aeric.games/rwnd/api/html/index.html";
         private const string WindowTitle = "Coroutine Debugger";
+
         private static Color _highlightColor = new Color(0.7f, 0.8f, 0.9f, 1f);
 
         const float leftPaneWidth = 300;
@@ -64,6 +42,7 @@ namespace aeric.coroutinery
         }
 
         private static Dictionary<string, Texture2D> _textureCache = new Dictionary<string, Texture2D>();
+        private Texture2D separatorTexture;
 
         private static Texture2D LoadCachedTexture(string texturePath)
         {
@@ -81,7 +60,6 @@ namespace aeric.coroutinery
         }
 
 
-
         enum FilterMode
         {
             FILTER_NAME,
@@ -89,6 +67,7 @@ namespace aeric.coroutinery
         }
 
         FilterMode filterMode = FilterMode.FILTER_NAME;
+        bool filterOnSelection = false;
 
         CoroutineDebugInfo _debugInfo = null;
 
@@ -96,7 +75,6 @@ namespace aeric.coroutinery
         Vector2 debugInfoScrollPosition;
         int coroutineIndex;
 
-        bool filterOnSelection = false;
         bool breakOnFinished = false;
         bool logSteps = false;
         bool selectedCoroutineChanged = false;
@@ -116,17 +94,15 @@ namespace aeric.coroutinery
             DrawRightPane(windowWidth, windowHeight);
 
             DrawHelpButton(windowWidth);
-
-            Repaint();
         }
 
         DateTime lastRepaint;
         GameObject[] lastSelectedObjectss;
 
         void Update()
-        {
+        {            
             //check for conditions that should cause a repaint
-            if (EditorApplication.isPlaying && (DateTime.Now - lastRepaint).TotalMilliseconds > 1000)
+            if (EditorApplication.isPlaying && (this.hasFocus || (DateTime.Now - lastRepaint).TotalMilliseconds > 1000))
             {
                 Repaint();
                 lastRepaint = DateTime.Now;
@@ -169,22 +145,30 @@ namespace aeric.coroutinery
                 //open url to the documentation
                 Application.OpenURL(HelpUrl);
             }
-            //call ongui again on a timer
-            //  Repaint();
         }
 
-        string search = string.Empty;
+        string searchContents = string.Empty;
 
-        bool cleared = false;
+        bool clearedSearch = false;
         private Vector2 coroutineStackScrollPosition;
-        private ulong lastSelectedCoroutineId;
+       
+        private Dictionary<string, GUIStyle> cachedGUIStyles = new Dictionary<string, GUIStyle>();
 
         internal GUIStyle GetGUIStyle(string styleName)
         {
+            if (cachedGUIStyles.ContainsKey(styleName))
+            {
+                return cachedGUIStyles[styleName];
+            }
+
             GUIStyle gUIStyle = GUI.skin.FindStyle(styleName) ?? EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector).FindStyle(styleName);
             if (gUIStyle == null)
             {
                 Debug.LogError("Missing built-in guistyle " + styleName);
+            }
+            else
+            {
+                cachedGUIStyles.Add(styleName, gUIStyle);
             }
 
             return gUIStyle;
@@ -203,7 +187,6 @@ namespace aeric.coroutinery
 
             int stackCountToShow = Math.Min(stackHandles.Count, 10);
 
-            //TODO: this isnt right, 30 was just a guess, and we aren't accounting for the label height
             float stackHeight = 20 * stackCountToShow;
             stackAreaHeight = stackHeight + (separatorWidth + 4) + 2 + 24;
 
@@ -278,8 +261,6 @@ namespace aeric.coroutinery
                                 using (new EditorGUILayout.HorizontalScope())
                                 {
                                     bool isSelectedCoroutine = (handle._id == selectedCoroutine._id);
-                                  //  if (i > 1)
-                                  //      GUILayout.Space(indent * (i - 1));
                                     if (isSelectedCoroutine)
                                         GUILayout.Label(stackPtrIcon, GUILayout.Width(20), GUILayout.Height(20));
 
@@ -307,8 +288,10 @@ namespace aeric.coroutinery
 
         private void DrawDividor(Rect rect)
         {
-            //TODO: cache the textures
-            Texture2D separatorTexture = MakeTex(1, 1, Color.black);
+            if (separatorTexture == null)
+            {
+                separatorTexture = MakeTex(1, 1, Color.black);
+            }
             GUI.DrawTexture(rect, separatorTexture);
         }
 
@@ -320,7 +303,6 @@ namespace aeric.coroutinery
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
-                        //TODO: string constants
                         EditorGUILayout.LabelField("Search:", EditorStyles.label, GUILayout.MaxWidth(leftPaneWidth * 0.15f));
 
                         string[] tabOptions = new string[] { "Name", "Tag" };
@@ -334,9 +316,6 @@ namespace aeric.coroutinery
                         filterMode = (FilterMode)GUILayout.Toolbar((int)filterMode, arraytabContent, GUILayout.MaxWidth(leftPaneWidth * 0.3f));
 
                         GUILayout.FlexibleSpace();
-
-                        //v/ar st = EditorStyles.label;
-                       // st.alignment = TextAnchor.MiddleRight;
                         filterOnSelection = EditorGUILayout.ToggleLeft(new GUIContent("Selection", "Limit the search to coroutines that have a GameObject context that is included in the scene selection"), filterOnSelection, GUILayout.MaxWidth(leftPaneWidth * 0.3f));
                     }
 
@@ -344,8 +323,6 @@ namespace aeric.coroutinery
                     {
                         //This is a lot of work to get a search field with a cancel button
                         //This is because Unity keeps certain minor elements as internal, so we have to recreate or workaround them
-
-                        //TODO: cache these
                         GUIStyle cancelButtonStyle = GetGUIStyle("SearchCancelButton");
                         GUIStyle emptyCancelButtonStyle = GetGUIStyle("SearchCancelButtonEmpty");
                         float fixedWidth = cancelButtonStyle.fixedWidth;
@@ -354,7 +331,7 @@ namespace aeric.coroutinery
                         Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.fieldWidth, kLabelFloatMaxW, 18, 18, EditorStyles.toolbarSearchField);
                         rect.width -= fixedWidth;
 
-                        bool empty = string.IsNullOrEmpty(search);
+                        bool empty = string.IsNullOrEmpty(searchContents);
 
                         Rect position = rect;
                         position.x += rect.width;
@@ -363,31 +340,28 @@ namespace aeric.coroutinery
                         GUI.SetNextControlName("coroutinerysearchfield");
 
                         //TODO: different search text per mode
-                        search = EditorGUI.TextField(rect, search, EditorStyles.toolbarSearchField);
+                        searchContents = EditorGUI.TextField(rect, searchContents, EditorStyles.toolbarSearchField);
 
                         GUI.SetNextControlName("searchcancelbutton");
                         if (GUI.Button(position, GUIContent.none, !empty ? cancelButtonStyle : emptyCancelButtonStyle))
                         {
-                            search = string.Empty;
+                            searchContents = string.Empty;
                             //If we don't change focus then the text field doesn't actually clear
                             GUI.FocusControl("searchcancelbutton");
 
                             Repaint();
-                            cleared = true;
+                            clearedSearch = true;
                         }
-                        else if (cleared)
+                        else if (clearedSearch)
                         {
-                            cleared = false;
+                            clearedSearch = false;
                             EditorGUI.FocusTextInControl("coroutinerysearchfield");
                         }
 
-
-                        //TODO: helper for horizontal dividors
                         //draw the dividor
                         Rect dividorRect = EditorGUILayout.GetControlRect(GUILayout.Height(separatorWidth + 4));
                         dividorRect = new Rect(0, dividorRect.y + 2, leftPaneWidth, 1);
                         DrawDividor(dividorRect);
-
 
                         List<CoroutineHandle> coroutines = new List<CoroutineHandle>();
 
@@ -401,10 +375,10 @@ namespace aeric.coroutinery
                                 switch (filterMode)
                                 {
                                     case FilterMode.FILTER_TAG:
-                                        coroutines = CoroutineManager.Instance.GetCoroutinesByTag(search);
+                                        coroutines = CoroutineManager.Instance.GetCoroutinesByTag(searchContents);
                                         break;
                                     case FilterMode.FILTER_NAME:
-                                        coroutines = CoroutineManager.Instance.GetCoroutinesByName(search, _debugInfo);
+                                        coroutines = CoroutineManager.Instance.GetCoroutinesByName(searchContents, _debugInfo);
                                         break;
                                 }
 
@@ -442,8 +416,6 @@ namespace aeric.coroutinery
                                     //check if the mouse is within the scrollview
                                     if (mousePosRelative.x > 0 && mousePosRelative.x < scrollSize.x && mousePosRelative.y > 0 && mousePosRelative.y < scrollSize.y)
                                     {
-                                        //TODO: have to account for the scroll position
-
                                         //get the index of the item that was clicked on
                                         coroutineIndex = (int)(mousePos.y / 20);
                                         if (coroutineIndex >= 0 && coroutineIndex < coroutines.Count)
@@ -502,9 +474,8 @@ namespace aeric.coroutinery
 
                                 //get the editor text color
                                 var currentStyle = new GUIStyle(GUI.skin.textField);
-                                currentStyle.normal.background = MakeTex(2, 2, new Color(0.2f, 0.3f, 0.4f, 0.5f));//TODO: constant
 
-
+                                currentStyle.normal.background = MakeTex(2, 2, new Color(0.2f, 0.3f, 0.4f, 0.5f));
 
                                 foreach (var coroutine in coroutines)
                                 {
@@ -533,12 +504,11 @@ namespace aeric.coroutinery
                         dividorRect = new Rect(0, dividorRect.y + 2, leftPaneWidth, 1);
                         DrawDividor(dividorRect);
 
-                        //TODO: string constants
-                        breakOnFinished = EditorGUILayout.Toggle(new GUIContent("Break on Done", "Issues a Debug.Break call each time a coroutine finishes"), breakOnFinished);//TODO: string
+                        breakOnFinished = EditorGUILayout.Toggle(new GUIContent("Break on Done", "Issues a Debug.Break call each time a coroutine finishes"), breakOnFinished);
                         if (CoroutineManager.Instance != null)
                             CoroutineManager.Instance.BreakOnFinished = breakOnFinished;
 
-                        logSteps = EditorGUILayout.Toggle(new GUIContent("Log Steps", "Log each step of every coroutines execution"), logSteps);//TODO: string
+                        logSteps = EditorGUILayout.Toggle(new GUIContent("Log Steps", "Log each step of every coroutines execution"), logSteps);
                         if (CoroutineManager.Instance != null)
                             CoroutineManager.Instance.LogSteps = logSteps;
 
@@ -554,10 +524,13 @@ namespace aeric.coroutinery
             Repaint();
 
             var context = CoroutineManager.Instance.GetCoroutineContext(coroutineHandle);
-            if (context is GameObject)
+            if (selectedCoroutines.Count == 1)
             {
-                //highlight the GameObject
-             //   Selection.activeGameObject = (GameObject)context;
+                if (context is GameObject)
+                {
+                    //highlight the GameObject
+                    Selection.activeGameObject = (GameObject)context;
+                }
             }
         }
 
@@ -612,7 +585,7 @@ namespace aeric.coroutinery
                 EditorGUILayout.LabelField(prettyName);
 
                 //Status toolbar
-                int buttonSize = 20;//TODO: constant
+                int buttonSize = 20;
                 //Load the Textures for the icons and then make a toolbar
                 Texture2D playIcon = LoadCachedTexture(IconPath_Play);
                 Texture2D stopicon = LoadCachedTexture(IconPath_Stop);
@@ -802,12 +775,6 @@ namespace aeric.coroutinery
                 string[] lines = stackTrace.Split('\n');
 
                 //Find the first line in the stack that is not in aeric library code
-
-
-                //" at aeric."
-
-                //split stackTrace into lines
-                //get the first line that does not contain "aeric.coroutinery.CoroutineManager"
                 int index = 1;
 
                 //Find the line containing the StartCoroutine call

@@ -14,16 +14,19 @@ using Debug = UnityEngine.Debug;
 namespace aeric.coroutinery
 {
     /// <summary>
-    /// Hooks into script compilation to build source mappings for coroutines
+    /// Hooks into script compilation to build source mappings for coroutines.
+    /// Can be triggered manually via menu item or automatically on assembly compilation.
     /// </summary>
     [InitializeOnLoad]
     public class ScriptCompilationHook
     {
         static ScriptCompilationHook() {
+            //Register for script compilation events
             CompilationPipeline.compilationFinished += OnCompilationFinished;
             CompilationPipeline.assemblyCompilationFinished += OnAssemblyCompilationFinished;
         }
 
+        //Rebuild the source mappings for all user script assemblies
         [MenuItem("Coroutinery/Rebuild Source Mappings")]
         public static void RebuildAll()
         {
@@ -36,9 +39,9 @@ namespace aeric.coroutinery
             }
         }
 
-        //add menu item to enable stack collection
+        //add menu item to toggle stack trace capture
         [MenuItem("Coroutinery/Stack Traces")]
-        public static void TogglStackCollection()
+        public static void ToggleStackCollection()
         {
             bool collectStacks = EditorPrefs.GetBool("Coroutinery/Stack Traces", false);
             collectStacks = !collectStacks;
@@ -76,6 +79,7 @@ namespace aeric.coroutinery
 
         private static void OnAssemblyCompilationFinished(string assemblyPath, CompilerMessage[] arg2)
         {
+            //If auto build mappings is enabled, build the mappings for this assembly
             bool autoBuildMappings = EditorPrefs.GetBool("Coroutinery/Auto build source mappings", true);
             if (autoBuildMappings)
             {
@@ -83,6 +87,7 @@ namespace aeric.coroutinery
             }
         }
 
+        //Determine if this is a user script assembly that we should capture coroutines from
         private static bool IsUserScriptAssembly(string assemblyPath)
         {
             if (!assemblyPath.Contains("ScriptAssemblies")) return false;
@@ -101,8 +106,9 @@ namespace aeric.coroutinery
                 return;
             }
 
-            Debug.Log($"Processing assembly: {assemblyPath}");
+            LogCompilationInfo($"Processing assembly: {assemblyPath}");
 
+            //Time the overal process 
             Stopwatch overallTimer = new Stopwatch();
             overallTimer.Start();
 
@@ -111,28 +117,31 @@ namespace aeric.coroutinery
             IEnumerable<TypeDefinition> typeDefs;
             List<Type> enumeratorTypes = new List<Type>();
 
-            {
-                Stopwatch assemblyLoadTimer = new Stopwatch();
-                assemblyLoadTimer.Start();
+            /////////////////////////////////////////////////////////////////////////////////////////
+            //Load the assembly definition, and time it
+            Stopwatch assemblyLoadTimer = new Stopwatch();
+            assemblyLoadTimer.Start();
 
-                assemblyDef = AssemblyDefinition.ReadAssembly(assemblyPath, new ReaderParameters { ReadSymbols = true, ReadWrite = false });
-                typeDefs = assemblyDef.MainModule.GetTypes();
+            assemblyDef = AssemblyDefinition.ReadAssembly(assemblyPath, new ReaderParameters { ReadSymbols = true, ReadWrite = false });
+            typeDefs = assemblyDef.MainModule.GetTypes();
 
-                assemblyLoadTimer.Stop();
-                Debug.Log($"Time loading type defs: {assemblyLoadTimer.ElapsedMilliseconds} ms");
-            }
+            assemblyLoadTimer.Stop();
+            LogCompilationInfo($"Time loading type defs: {assemblyLoadTimer.ElapsedMilliseconds} ms");
+            /////////////////////////////////////////////////////////////////////////////////////////
 
+            //Get the asset for this assembly and clear out its data prior to replacing it
             CoroutineAssemblySourceMappings assemblyDebugAsset = debugInfoAsset.GetAssemblySourceMapping(assemblyDef.Name.Name);
             assemblyDebugAsset.ClearData();
 
             foreach (TypeDefinition typeDef in typeDefs)
             {
+                //to capture coroutines we first look for compiler-generated types
                 if (!typeDef.HasCustomAttributes) continue;
                 //does it have the CompilerGeneratedAttribute 
                 bool isCompilerGenerated = typeDef.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.CompilerGeneratedAttribute");
                 if (!isCompilerGenerated) continue;
 
-                //does it have the IEnumerator interface
+                //then we look for the IEnumerator interface
                 bool isEnumerator = typeDef.Interfaces.Any(i => i.InterfaceType.FullName == "System.Collections.IEnumerator");
                 if (!isEnumerator) continue;
 
@@ -145,6 +154,7 @@ namespace aeric.coroutinery
 
                 foreach (MethodDefinition m in typeDef.Methods)
                 {
+                    //We are looking for MoveNext methods that have debug information
                     if (!m.Name.Contains("MoveNext")) continue;
                     if (!m.HasBody) continue;
                     if (m.DebugInformation == null) continue;
@@ -152,6 +162,7 @@ namespace aeric.coroutinery
                     
                     Collection<Instruction> instructions = m.Body.Instructions;
 
+                    //Get the relative path of the source file
                     string fullUrl = m.DebugInformation.SequencePoints[0].Document.Url;
                     string url = fullUrl.Substring(fullUrl.IndexOf("Assets"));
                     sourceMapping.sourceUrl = url;
@@ -198,18 +209,20 @@ namespace aeric.coroutinery
 
             // Stop stopwatch
             overallTimer.Stop();
-            Debug.Log($"Elapsed time: {overallTimer.ElapsedMilliseconds} ms");
-
+            LogCompilationInfo($"Elapsed time: {overallTimer.ElapsedMilliseconds} ms");
         }
 
+        private static void LogCompilationInfo(string msg)
+        {
+            Debug.Log(msg);
+        }
         private static void AddSourceMappingPoint(Instruction destInstr, MethodDebugInformation debugInformation, List<int> sourcePts)
         {
             SequencePoint destSeqPt;
             do
             {
                 destSeqPt = debugInformation.GetSequencePoint(destInstr);
-                //TODO: temp constant to skip invalid lines
-                if (destSeqPt != null && destSeqPt.StartLine < 100000)
+                if (destSeqPt != null && destSeqPt.StartLine < 0xFEEFEE)
                 {
                     sourcePts.Add(destSeqPt.StartLine);
                 }
@@ -218,7 +231,6 @@ namespace aeric.coroutinery
                     destSeqPt = null;
                     destInstr = destInstr.Next;
                 }
-
             } while (destSeqPt == null);
         }
 
@@ -236,6 +248,8 @@ namespace aeric.coroutinery
                 string[] debugAssets = AssetDatabase.FindAssets("t:CoroutineDebugInfo");
                 if (debugAssets.Length == 0)
                 {
+                    Debug.LogWarning("No CoroutineDebugInfo was found, creating a new one");
+
                     //No asset so lets create one
                     debugAsset = ScriptableObject.CreateInstance<CoroutineDebugInfo>();
                     AssetDatabase.CreateAsset(debugAsset, fullPath);
@@ -267,8 +281,7 @@ namespace aeric.coroutinery
         }
 
         private static void OnCompilationFinished(object obj)
-        {
-  
+        {  
         }
     }
 }

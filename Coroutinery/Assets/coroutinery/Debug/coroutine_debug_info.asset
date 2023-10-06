@@ -254,3 +254,198 @@ MonoBehaviour:
     sourceMapping: []
   - assemblyName: SharedDataStructures
     sourceMapping: []
+  - assemblyName: DTT.PublishingTools.Runtime
+    sourceMapping: []
+  - assemblyName: DTT.PublishingTools.Editor
+    sourceMapping: []
+  - assemblyName: DTT.EditorUtilities.Editor
+    sourceMapping: []
+  - assemblyName: DTT.EditorUtilities.Demo
+    sourceMapping: []
+  - assemblyName: DTT.CoroutineManagement.Demo
+    sourceMapping:
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Examples\Scripts\AdvancedWaitScriptableObject.cs
+      typeName: <WaitForPlayerCreation>d__6
+      typeNamespace: 
+      stateSourcePoints: 6a000000
+      outerTypeName: AdvancedWaitScriptableObject
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Examples\Scripts\AdvancedWaitScriptableObject.cs
+      typeName: <WaitForEnemiesToSpawn>d__7
+      typeNamespace: 
+      stateSourcePoints: 7d000000
+      outerTypeName: AdvancedWaitScriptableObject
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Examples\Scripts\AdvancedWaitScriptableObject.cs
+      typeName: <WaitForNonPlayerCharacterSpawns>d__8
+      typeNamespace: 
+      stateSourcePoints: 90000000
+      outerTypeName: AdvancedWaitScriptableObject
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Examples\Scripts\CoroutineScriptableObject.cs
+      typeName: <LinearlyInterpolateValue>d__2
+      typeNamespace: 
+      stateSourcePoints: 2a000000
+      outerTypeName: CoroutineScriptableObject
+  - assemblyName: DTT.CoroutineManagement.Tests
+    sourceMapping:
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_StartCoroutine_WithNullReference>d__1
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 25000000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_StopCoroutine_WithNullReference>d__2
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 31000000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <WaitForTime>d__3
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 38000000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_StartUserCoroutine>d__4
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 4a000000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_StartUserCoroutine_WithNullReference>d__5
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 57000000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_WaitSeconds_GetsCalledWithInTheDuration>d__6
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 85000000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_StatusChecks>d__7
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 8d000000940000009b000000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_WaitUntil_ChangesAfterPredicateSwitches>d__8
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: a8000000b3000000b5000000b7000000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_WaitUntilWithTimeout_UsingTimeout>d__9
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: c1000000cc000000ce000000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_WaitUntilWithTimeout_UsingPredicate>d__10
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: d7000000e0000000e4000000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_WaitForCustomeYield_ChangesAfterPredicateSwitches>d__11
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: ee000000fa000000fc000000fe000000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_WaitForCustomeYield_UsingTimeout>d__12
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 080100001401000016010000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_WaitForCustomeYield_UsingPredicate>d__13
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 1f010000290100002d010000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_WaitForEndOfFrame_GetsCalledInTheSameFrame>d__14
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 41010000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_Stop_ActuallyDoesStop>d__15
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 56010000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_Stop_StoppedCoroutine>d__16
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 6a010000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_Stop_FinishedCoroutine>d__17
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 72010000780100007b010000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_Start_StartedCoroutine>d__18
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 8b010000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_CleanseFinishedCallbackTargets>d__20
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: aa010000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_ActiveCoroutines_CheckCoroutinesGetCleanedUpAfterFinishing>d__21
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: bc010000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_ActiveCoroutines_CheckCoroutinesGetCleanedUpAfterStopping>d__22
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: c8010000d0010000d5010000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_CoroutineManager_FinishedEvent_FinishedDoesntGetCalledAfterStopping>d__23
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: e0010000e9010000ed010000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_WaitForAny_Conditions>d__24
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 0c020000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_WaitForAny_IEnumerators>d__25
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 2c020000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_WaitForAll_IEnumerators>d__26
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 4e020000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_WaitForAll_Conditions>d__27
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 6f020000
+      outerTypeName: Test_CoroutineManager
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Tests\Runtime\Test_CoroutineManager.cs
+      typeName: <Test_WaitForFrames>d__28
+      typeNamespace: DTT.Utils.CoroutineManagement.Tests
+      stateSourcePoints: 81020000
+      outerTypeName: Test_CoroutineManager
+  - assemblyName: DTT.RuntimeUtilities.Runtime
+    sourceMapping: []
+  - assemblyName: DTT.CoroutineManagement.Editor
+    sourceMapping: []
+  - assemblyName: DTT.CoroutineManagement.Runtime
+    sourceMapping:
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Runtime\CompositeCoroutineWrapper.cs
+      typeName: <WaitOnYield>d__5
+      typeNamespace: DTT.Utils.CoroutineManagement
+      stateSourcePoints: 3d000000
+      outerTypeName: CompositeCoroutineWrapper
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Runtime\CoroutineWrapper.cs
+      typeName: <WaitOnYield>d__2
+      typeNamespace: DTT.Utils.CoroutineManagement
+      stateSourcePoints: 23000000
+      outerTypeName: CoroutineWrapper
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Runtime\CoroutineWrapperBase.cs
+      typeName: <StartCoroutine>d__26
+      typeNamespace: DTT.Utils.CoroutineManagement
+      stateSourcePoints: 85000000
+      outerTypeName: CoroutineWrapperBase
+    - sourceUrl: Assets\competitors\DTT\Coroutine Management\Runtime\CustomCoroutineWrapper.cs
+      typeName: <WaitOnYield>d__2
+      typeNamespace: DTT.Utils.CoroutineManagement
+      stateSourcePoints: 20000000
+      outerTypeName: CustomCoroutineWrapper
+  - assemblyName: DTT.RuntimeUtilities.Demo
+    sourceMapping: []

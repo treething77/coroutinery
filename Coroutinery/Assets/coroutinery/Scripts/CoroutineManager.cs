@@ -3,7 +3,6 @@
 #define NOT_DISABLE_AERIC_LOGS
 #endif
 
-using MEC;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -137,7 +136,7 @@ namespace aeric.coroutinery
         {
             get
             {
-                if (_manager == null)
+                if (_manager == null && Application.isPlaying)
                 {
                     CreateManager();
                     _manager.Initialize();
