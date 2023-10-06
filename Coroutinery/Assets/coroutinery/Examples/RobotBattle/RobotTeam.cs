@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace aeric.coroutinery_demos
 {
-    //used in the Rewind and Replay demos
     public class RobotTeam : MonoBehaviour {
         public List<Robot> _robots;
 

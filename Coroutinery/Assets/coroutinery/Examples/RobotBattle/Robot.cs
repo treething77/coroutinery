@@ -4,9 +4,6 @@ using UnityEngine.Serialization;
 
 namespace aeric.coroutinery_demos
 {
-    /// <summary>
-    /// Handles the AI and player behavior/controls in the Rewind and Replay demos
-    /// </summary>
     public class Robot : MonoBehaviour {
         private static readonly int _animIDMotionBlend = Animator.StringToHash("Speed");
         private static readonly int _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");

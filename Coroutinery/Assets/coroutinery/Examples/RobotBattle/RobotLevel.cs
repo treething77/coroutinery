@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace aeric.coroutinery_demos {
-    //Used in the Replay and Rewind demos
     public class RobotLevel : MonoBehaviour {
         public static RobotLevel _instance;
 
