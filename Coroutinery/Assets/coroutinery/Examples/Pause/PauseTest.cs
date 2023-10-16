@@ -1,8 +1,5 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 using aeric.coroutinery;
+using System.Collections;
 using UnityEngine;
 
 namespace aeric.demos

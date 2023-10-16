@@ -3,14 +3,17 @@ using UnityEngine;
 
 namespace aeric.coroutinery_demos
 {
-    public class RobotTeam : MonoBehaviour {
+    public class RobotTeam : MonoBehaviour
+    {
         public List<Robot> _robots;
 
         public Color teamColor;
         public int teamIndex;
 
-        private void Start() {
-            foreach (var robot in _robots) {
+        private void Start()
+        {
+            foreach (var robot in _robots)
+            {
                 robot.Team = this;
                 robot.UpdateTeamColor();
             }

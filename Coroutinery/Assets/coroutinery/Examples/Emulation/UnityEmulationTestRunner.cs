@@ -1,7 +1,4 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using aeric.coroutinery;
 using UnityEngine;
 
 namespace aeric.demos

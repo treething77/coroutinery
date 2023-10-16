@@ -3,8 +3,10 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace aeric.coroutinery_demos {
-    public class RobotLevel : MonoBehaviour {
+namespace aeric.coroutinery_demos
+{
+    public class RobotLevel : MonoBehaviour
+    {
         public static RobotLevel _instance;
 
         public GameObject targetRoot;
@@ -15,22 +17,26 @@ namespace aeric.coroutinery_demos {
         //reference caching
         private List<MoveTarget> _targets;
 
-        private void Awake() {
+        private void Awake()
+        {
             _instance = this;
         }
 
-        private void Start() {
+        private void Start()
+        {
             _targets = targetRoot.GetComponentsInChildren<MoveTarget>().ToList();
         }
 
-        private void Update() {
+        private void Update()
+        {
             if (_redTeamScoreTxt != null)
                 _redTeamScoreTxt.text = "Red: " + _targets.Count(x => x.CapturedTeamIndex == 1);
             if (_blueTeamScoreTxt != null)
                 _blueTeamScoreTxt.text = "Blue: " + _targets.Count(x => x.CapturedTeamIndex == 2);
         }
 
-        public int FindTarget(Robot robot) {
+        public int FindTarget(Robot robot)
+        {
             MoveTarget newTarget = null;
 
             var availableTargets = new List<MoveTarget>();
@@ -42,7 +48,8 @@ namespace aeric.coroutinery_demos {
             //-one that isn't captured by our team
             //-one that isn't being targeted by a robot on the same team)
 
-            for (var i = 0; i < _targets.Count; i++) {
+            for (var i = 0; i < _targets.Count; i++)
+            {
                 var target = _targets[i];
 
                 if (target.CapturedTeamIndex == team.teamIndex)
@@ -59,9 +66,11 @@ namespace aeric.coroutinery_demos {
 
             //choose the closest available target
             var closestDist = float.MaxValue;
-            foreach (var target in availableTargets) {
+            foreach (var target in availableTargets)
+            {
                 var dist = Vector3.Distance(robot.transform.position, target.transform.position);
-                if (dist < closestDist) {
+                if (dist < closestDist)
+                {
                     closestDist = dist;
                     newTarget = target;
                 }
@@ -70,16 +79,19 @@ namespace aeric.coroutinery_demos {
             return _targets.IndexOf(newTarget);
         }
 
-        public Vector3 GetTargetPosition(int moveTargetIndex) {
+        public Vector3 GetTargetPosition(int moveTargetIndex)
+        {
             return _targets[moveTargetIndex].transform.position;
         }
 
-        public void CaptureTarget(int moveTargetIndex, Robot robot) {
+        public void CaptureTarget(int moveTargetIndex, Robot robot)
+        {
             if (moveTargetIndex < 0 || moveTargetIndex >= _targets.Count) return;
             _targets[moveTargetIndex].Capture(robot);
         }
 
-        public Color GetTeamColor(int teamIndex) {
+        public Color GetTeamColor(int teamIndex)
+        {
             foreach (var team in _robotTeams)
                 if (team.teamIndex == teamIndex)
                     return team.teamColor;
@@ -87,8 +99,10 @@ namespace aeric.coroutinery_demos {
             return Color.grey;
         }
 
-        public void CaptureTargetsWithinRange(Vector3 pt, float captureRange, Robot robot) {
-            for (var i = 0; i < _targets.Count; i++) {
+        public void CaptureTargetsWithinRange(Vector3 pt, float captureRange, Robot robot)
+        {
+            for (var i = 0; i < _targets.Count; i++)
+            {
                 var target = _targets[i];
                 if (target.CapturedTeamIndex != robot.Team.teamIndex)
                     if ((target.transform.position - pt).magnitude < captureRange)

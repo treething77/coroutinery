@@ -1,6 +1,6 @@
+using aeric.coroutinery;
 using System.Collections;
 using System.Text;
-using aeric.coroutinery;
 using UnityEngine;
 
 namespace aeric.demos
@@ -37,7 +37,7 @@ namespace aeric.demos
             string indentation = "";
 
             while (coroutineHandle.IsValid)
-            {             
+            {
                 string prettyName = CoroutineManager.Instance.GetCoroutinePrettyName(coroutineHandle, coroutineDebugInfo);
 
                 sb.AppendLine(indentation + prettyName);
@@ -59,7 +59,7 @@ namespace aeric.demos
                 //Start a coroutine that creates a deep stack to a semi-random depth
                 int stackDepth = Random.Range(1, 100);
                 yield return this.BeginCoroutine(StackCoroutine(0, stackDepth));
-                
+
                 Debug.Log("RootCoroutine: Stack coroutine ended.");
             }
         }

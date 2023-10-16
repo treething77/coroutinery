@@ -16,7 +16,7 @@ namespace aeric.coroutinery
 
         protected override void CloseScope()
         {
-            GUILayout.EndArea();            
+            GUILayout.EndArea();
         }
     }
 }

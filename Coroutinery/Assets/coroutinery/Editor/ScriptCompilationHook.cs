@@ -1,10 +1,10 @@
+using Mono.Cecil;
+using Mono.Cecil.Cil;
+using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
-using Mono.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEngine;
@@ -20,14 +20,15 @@ namespace aeric.coroutinery
     [InitializeOnLoad]
     public class ScriptCompilationHook
     {
-        static ScriptCompilationHook() {
+        static ScriptCompilationHook()
+        {
             //Register for script compilation events
             CompilationPipeline.compilationFinished += OnCompilationFinished;
             CompilationPipeline.assemblyCompilationFinished += OnAssemblyCompilationFinished;
         }
 
         //Rebuild the source mappings for all user script assemblies
-        [MenuItem("Coroutinery/Rebuild Source Mappings")]
+        [MenuItem("Tools/Coroutinery/Rebuild Source Mappings")]
         public static void RebuildAll()
         {
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -40,7 +41,7 @@ namespace aeric.coroutinery
         }
 
         //add menu item to toggle stack trace capture
-        [MenuItem("Coroutinery/Stack Traces")]
+        [MenuItem("Tools/Coroutinery/Stack Traces")]
         public static void ToggleStackCollection()
         {
             bool collectStacks = EditorPrefs.GetBool("Coroutinery/Stack Traces", false);
@@ -50,7 +51,7 @@ namespace aeric.coroutinery
         }
 
         //validate menu item
-        [MenuItem("Coroutinery/Stack Traces", true)]
+        [MenuItem("Tools/Coroutinery/Stack Traces", true)]
         public static bool TogglStackCollectionValidate()
         {
             bool collectStacks = EditorPrefs.GetBool("Coroutinery/Stack Traces", false);
@@ -59,7 +60,7 @@ namespace aeric.coroutinery
         }
 
         //add menu item to set auto build mappings
-        [MenuItem("Coroutinery/Auto build source mappings")]
+        [MenuItem("Tools/Coroutinery/Auto build source mappings")]
         public static void ToggleAutoBuildMappings()
         {
             bool autoBuildMappings = EditorPrefs.GetBool("Coroutinery/Auto build source mappings", true);
@@ -69,13 +70,13 @@ namespace aeric.coroutinery
         }
 
         //validate menu item
-        [MenuItem("Coroutinery/Auto build source mappings", true)]
+        [MenuItem("Tools/Coroutinery/Auto build source mappings", true)]
         public static bool ToggleAutoBuildMappingsValidate()
         {
             bool autoBuildMappings = EditorPrefs.GetBool("Coroutinery/Auto build source mappings", true);
             Menu.SetChecked("Coroutinery/Auto build source mappings", autoBuildMappings);
             return true;
-        }   
+        }
 
         private static void OnAssemblyCompilationFinished(string assemblyPath, CompilerMessage[] arg2)
         {
@@ -98,7 +99,7 @@ namespace aeric.coroutinery
         private static void BuildAssemblySourceMapping(string assemblyPath)
         {
             if (!IsUserScriptAssembly(assemblyPath)) return;
-                        
+
             CoroutineDebugInfo debugInfoAsset = LoadCoroutineDebugAsset();
             if (debugInfoAsset == null)
             {
@@ -159,14 +160,14 @@ namespace aeric.coroutinery
                     if (!m.HasBody) continue;
                     if (m.DebugInformation == null) continue;
                     if (!m.DebugInformation.HasSequencePoints) continue;
-                    
+
                     Collection<Instruction> instructions = m.Body.Instructions;
 
                     //Get the relative path of the source file
                     string fullUrl = m.DebugInformation.SequencePoints[0].Document.Url;
                     string url = fullUrl.Substring(fullUrl.IndexOf("Assets"));
                     sourceMapping.sourceUrl = url;
-                            
+
                     //Most coroutines will have a switch on the current state
                     Instruction stateSwitch = instructions.FirstOrDefault(i => (i.OpCode.Code == Code.Switch));
                     if (stateSwitch != null)
@@ -182,7 +183,7 @@ namespace aeric.coroutinery
                             if (destInstr == null) continue;
 
                             //get the sequence point for the destination instruction
-                            AddSourceMappingPoint(destInstr, m.DebugInformation, sourcePts);   
+                            AddSourceMappingPoint(destInstr, m.DebugInformation, sourcePts);
                         }
                     }
                     else
@@ -190,7 +191,7 @@ namespace aeric.coroutinery
                         //Simple coroutines might not have a switch on the current state
                         //in that case we just use the first instruction after the yield return
                         Instruction yieldReturnInstr = instructions.FirstOrDefault(i =>
-                                                                i.OpCode.Code == Code.Ldc_I4_1 && 
+                                                                i.OpCode.Code == Code.Ldc_I4_1 &&
                                                                 i.Next != null &&
                                                                 i.Next.OpCode.Code == Code.Ret);
                         if (yieldReturnInstr == null)
@@ -281,7 +282,7 @@ namespace aeric.coroutinery
         }
 
         private static void OnCompilationFinished(object obj)
-        {  
+        {
         }
     }
 }

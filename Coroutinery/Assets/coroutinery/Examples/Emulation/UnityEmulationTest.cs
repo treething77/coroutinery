@@ -1,7 +1,6 @@
-using System;
+using aeric.coroutinery;
 using System.Collections;
 using System.Collections.Generic;
-using aeric.coroutinery;
 using UnityEngine;
 
 namespace aeric.demos
@@ -45,7 +44,7 @@ namespace aeric.demos
                 yield return this.BeginCoroutine(BreakTest());
             else
                 yield return base.StartCoroutine(BreakTest());
-            
+
             yield return new WaitForFrames(1);
 
             RecordTiming("1a");
@@ -66,10 +65,10 @@ namespace aeric.demos
                 yield return base.StartCoroutine(SpinIt());
 
             RecordTiming("2b");
-                 
+
 
             yield return new WaitForFrames(1);
-            
+
             RecordTiming("3a");
 
             testComplete = true;
@@ -97,14 +96,14 @@ namespace aeric.demos
             }
 
             RecordTiming("spin - right");
-            
+
             float startT2 = Time.time;
             while ((Time.time - startT2) < 0.5f)
             {
                 this.transform.localRotation *= Quaternion.Euler(0, -2, 0);
                 yield return new WaitForFixedUpdate();
             }
-            
+
             RecordTiming("spin - up");
 
             float startT3 = Time.time;
@@ -112,7 +111,7 @@ namespace aeric.demos
             {
                 Debug.Log(Time.frameCount + " - " + Time.inFixedTimeStep);
 
-            //    RecordTiming("spin - " + Time.time);
+                //    RecordTiming("spin - " + Time.time);
 
                 rotCnt++;
                 this.transform.localRotation *= Quaternion.Euler(-2, 0, 0);

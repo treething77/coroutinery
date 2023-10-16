@@ -1,11 +1,12 @@
 using aeric.coroutinery;
-using aeric.demos;
 using System.Collections;
 using UnityEngine;
 
-namespace aeric.coroutinery_demos {
+namespace aeric.coroutinery_demos
+{
 
-    public class GameObjectCoroutineContext : MonoBehaviour {
+    public class GameObjectCoroutineContext : MonoBehaviour
+    {
         public void OnDestroy()
         {
             CoroutineManager.Instance.StopAllCoroutinesWithContext(gameObject);
@@ -26,10 +27,10 @@ namespace aeric.coroutinery_demos {
     {
         public int CapturedTeamIndex;
         public float captureIndicatorTimer;
-        
+
         public ParticleSystem captureVFX;
         public GameObject captureIndicator;
-        
+
         //component reference caching
         private Material _material;
         private Material _captureIndicatorMaterial;
@@ -39,10 +40,12 @@ namespace aeric.coroutinery_demos {
         private CoroutineHandle _bounceCoroutine;
         private CoroutineHandle _scaleCoroutine;
 
-        private void Awake() {
+        private void Awake()
+        {
             _material = GetComponent<MeshRenderer>().material;
 
-            if (captureIndicator != null) {
+            if (captureIndicator != null)
+            {
                 captureIndicator.SetActive(false);
                 _captureIndicatorMaterial = captureIndicator.GetComponent<MeshRenderer>().material;
             }
@@ -71,16 +74,19 @@ namespace aeric.coroutinery_demos {
             }
         }
 
-        private void Update() {
+        private void Update()
+        {
             //lerp color back to the team color
             _material.color = Color.Lerp(_material.color, RobotLevel._instance.GetTeamColor(CapturedTeamIndex), Time.deltaTime);
             transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one, Time.deltaTime);
 
-            if (captureIndicatorTimer > 0.0f) {
-                captureIndicator.transform.rotation = Quaternion.Euler(0.0f, captureIndicatorTimer * 200.0f,0.0f);
-                
+            if (captureIndicatorTimer > 0.0f)
+            {
+                captureIndicator.transform.rotation = Quaternion.Euler(0.0f, captureIndicatorTimer * 200.0f, 0.0f);
+
                 captureIndicatorTimer -= Time.deltaTime;
-                if (captureIndicatorTimer < 0.0f) {
+                if (captureIndicatorTimer < 0.0f)
+                {
                     captureIndicator.SetActive(false);
                 }
             }
@@ -104,7 +110,8 @@ namespace aeric.coroutinery_demos {
             CoroutineManager.Instance.ResumeCoroutine(_bounceCoroutine);
         }
 
-        public void Capture(Robot robot) {
+        public void Capture(Robot robot)
+        {
             CapturedTeamIndex = robot.Team.teamIndex;
 
             //turn white and scale up briefly when captured
@@ -122,16 +129,17 @@ namespace aeric.coroutinery_demos {
             });
 
 
-          //  transform.localScale = new Vector3(1.5f, 1.8f, 1.5f);
+            //  transform.localScale = new Vector3(1.5f, 1.8f, 1.5f);
 
             if (robot.Team.teamIndex == 2)
-               captureVFX.GetComponent<Renderer>().material = _vfxMaterialRed;
+                captureVFX.GetComponent<Renderer>().material = _vfxMaterialRed;
             else
-               captureVFX.GetComponent<Renderer>().material = _vfxMaterialBlue;
-           
+                captureVFX.GetComponent<Renderer>().material = _vfxMaterialBlue;
+
             captureVFX.Play();
 
-            if (captureIndicator != null) {
+            if (captureIndicator != null)
+            {
                 captureIndicator.SetActive(true);
                 _captureIndicatorMaterial.color = robot.Team.teamColor;
                 captureIndicatorTimer = 2.0f;

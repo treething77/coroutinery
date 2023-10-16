@@ -1,5 +1,4 @@
 using aeric.coroutinery;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,7 +30,7 @@ namespace aeric.demos
 
                 */
                 CoroutineManager.Instance.SetCoroutineLayer(coroutineHandle, 1);
-                CoroutineManager.Instance.SetCoroutineTag(coroutineHandle, allRed.Contains(obj)? "red" : "blue" );
+                CoroutineManager.Instance.SetCoroutineTag(coroutineHandle, allRed.Contains(obj) ? "red" : "blue");
                 CoroutineManager.Instance.SetCoroutineContext(coroutineHandle, obj);
 
                 offset += 0.5f;
@@ -99,11 +98,11 @@ namespace aeric.demos
 
                 //use Sin to make the object bob up and down
                 float y = Mathf.Sin(time) * moveDistance;
-                                
+
                 obj.transform.localPosition = startPos + new Vector3(0, y, 0);
 
                 yield return YieldStatics._WaitForEndOfFrame;
-                time += Time.deltaTime *0.0f;
+                time += Time.deltaTime * 0.0f;
 
                 yield return YieldStatics._WaitForEndOfFrame;
             }

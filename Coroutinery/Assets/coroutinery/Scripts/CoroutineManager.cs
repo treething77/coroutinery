@@ -77,8 +77,6 @@ namespace aeric.coroutinery
         public static WaitForEndOfFrame _WaitForEndOfFrame = new WaitForEndOfFrame();
         public static WaitForFixedUpdate _WaitForFixedUpdate = new WaitForFixedUpdate();
         public static WaitForLateUpdate _WaitForLateUpdate = new WaitForLateUpdate();
-
-
     }
 
     public class CoroutineUpdater : MonoBehaviour
@@ -127,7 +125,7 @@ namespace aeric.coroutinery
             FixedUpdate,
             LateUpdate,
             EndOfFrame,
-        //    UpdatePending
+            //    UpdatePending
         }
 
         private static CoroutineManager _manager;
@@ -193,7 +191,7 @@ namespace aeric.coroutinery
         private Dictionary<Object, List<CoroutineHandle>> _context = new Dictionary<Object, List<CoroutineHandle>>();
 
         private ulong _nextId = 0;
-                
+
         private FieldInfo waitForSecondValue;
 
         private Dictionary<CoroutineHandle, string> _stackTrace = new Dictionary<CoroutineHandle, string>();
@@ -227,11 +225,11 @@ namespace aeric.coroutinery
                 if (c._paused)
                 {
                     if (c._state == CoroutineState.Waiting_Time || c._state == CoroutineState.Waiting_Realtime)
-                    { 
+                    {
                         //For any paused coroutines waiting on a timer we will push the end time back
                         //by the amount of time we were paused
                         c._waitEndTime += Time.deltaTime;
-                    }   
+                    }
                     continue;
                 }
 
@@ -257,7 +255,7 @@ namespace aeric.coroutinery
                     }
                 }
                 else if (c._state == CoroutineState.Waiting_Time)
-                {                    
+                {
                     if (Time.time >= c._waitEndTime)
                     {
                         c._state = CoroutineState.Running;
@@ -298,7 +296,7 @@ namespace aeric.coroutinery
                 }
             }
 
-            foreach(var c in _startList)
+            foreach (var c in _startList)
             {
                 _coroutines.Add(c);
             }
@@ -331,7 +329,7 @@ namespace aeric.coroutinery
             //do the MoveNext first and then handle the results
             if (!co.MoveNext())
             {
-                CoroutineFinished( coroutine );
+                CoroutineFinished(coroutine);
             }
             else
             {
@@ -386,7 +384,7 @@ namespace aeric.coroutinery
 
         private ulong GetCoroutineIdFromEnumerator(IEnumerator enumerator)
         {
-            foreach(var c in _coroutines)
+            foreach (var c in _coroutines)
             {
                 if (c._enumerator == enumerator)
                     return c._handle._id;
@@ -399,7 +397,7 @@ namespace aeric.coroutinery
             return CoroutineHandle.InvalidHandle._id;
         }
 
- 
+
         private void CoroutineFinished(CoroutineData coroutine)
         {
             //Add to the kill list to be processed at the end of the frame
@@ -420,7 +418,7 @@ namespace aeric.coroutinery
 
             //check for any coroutines waiting on this one. Remove them from the wait list and
             //immediately trigger them (ie call RunCoroutineStep with them)
-            foreach(var co in _coroutines)
+            foreach (var co in _coroutines)
             {
                 if (co._state == CoroutineState.Waiting_Coroutine && co._waitCoroutineId == coroutine._handle._id)
                 {
@@ -532,7 +530,7 @@ namespace aeric.coroutinery
         }
 
         private void CoroutineCleanup(CoroutineData coroutine)
-        { 
+        {
             //Remove from context lists
             foreach (var contextList in _context)
             {
@@ -591,9 +589,10 @@ namespace aeric.coroutinery
 
         public List<CoroutineHandle> GetCoroutinesByTagNoCopy(string tag)
         {
-            if (string.IsNullOrEmpty(tag)) return new List<CoroutineHandle>(); 
+            if (string.IsNullOrEmpty(tag)) return new List<CoroutineHandle>();
 
-            if (!_tags.ContainsKey(tag)) {
+            if (!_tags.ContainsKey(tag))
+            {
                 List<CoroutineHandle> tagHandleList = new List<CoroutineHandle>();
                 _tags.Add(tag, tagHandleList);
             }
@@ -608,7 +607,8 @@ namespace aeric.coroutinery
         }
         public List<CoroutineHandle> GetCoroutinesByLayerNoCopy(int layer)
         {
-            if (!_layers.ContainsKey(layer)) {
+            if (!_layers.ContainsKey(layer))
+            {
                 List<CoroutineHandle> layerHandleList = new List<CoroutineHandle>();
                 _layers.Add(layer, layerHandleList);
             }
@@ -616,13 +616,16 @@ namespace aeric.coroutinery
         }
 
         //Returns a copy of the list
-        public List<CoroutineHandle> GetCoroutinesByContext(Object context) {
+        public List<CoroutineHandle> GetCoroutinesByContext(Object context)
+        {
             List<CoroutineHandle> internalList = GetCoroutinesByContextNoCopy(context);
             return new List<CoroutineHandle>(internalList);
         }
 
-        public List<CoroutineHandle> GetCoroutinesByContextNoCopy(Object context) {
-            if (!_context.ContainsKey(context)) {
+        public List<CoroutineHandle> GetCoroutinesByContextNoCopy(Object context)
+        {
+            if (!_context.ContainsKey(context))
+            {
                 List<CoroutineHandle> contextHandleList = new List<CoroutineHandle>();
                 _context.Add(context, contextHandleList);
             }
@@ -648,7 +651,7 @@ namespace aeric.coroutinery
 
         private bool CoroutineIsOnKillList(CoroutineHandle handle)
         {
-            foreach(var c in _killList)
+            foreach (var c in _killList)
             {
                 if (c._handle._id == handle._id) return true;
             }
@@ -716,7 +719,7 @@ namespace aeric.coroutinery
             PauseCoroutines(GetCoroutinesByContextNoCopy(context));
         }
 
-        public void ResumeCoroutine(CoroutineHandle handle, bool resumeChild = true) 
+        public void ResumeCoroutine(CoroutineHandle handle, bool resumeChild = true)
         {
             CoroutineData c = GetCoroutineByHandle(handle);
             if (c == null) return;//TODO: error
@@ -752,7 +755,7 @@ namespace aeric.coroutinery
         }
 
         //Set the context of a coroutine
-        public void SetCoroutineContext(CoroutineHandle handle, Object context) 
+        public void SetCoroutineContext(CoroutineHandle handle, Object context)
         {
             //If this coroutine already has a tag, remove it from the tag list
             if (_context.ContainsKey(context))
@@ -764,18 +767,18 @@ namespace aeric.coroutinery
         }
 
         //Get the context of a coroutine
-        public Object GetCoroutineContext(CoroutineHandle handle) 
+        public Object GetCoroutineContext(CoroutineHandle handle)
         {
             //Look at context lists and return context if handle exists in any of them
             foreach (var contextList in _context)
             {
                 if (contextList.Value.Contains(handle)) return contextList.Key;
             }
-            return null; 
+            return null;
         }
 
         //Set the tag of a coroutine
-        public void SetCoroutineTag(CoroutineHandle handle, string tag) 
+        public void SetCoroutineTag(CoroutineHandle handle, string tag)
         {
             //If this coroutine already has a tag, remove it from the tag list
             if (_tags.ContainsKey(tag))
@@ -787,7 +790,7 @@ namespace aeric.coroutinery
         }
 
         //Get the tag of a coroutine
-        public string GetCoroutineTag(CoroutineHandle handle) 
+        public string GetCoroutineTag(CoroutineHandle handle)
         {
             //Look at tag lists and return tag if handle exists in any of them
             foreach (var tagList in _tags)
@@ -798,13 +801,14 @@ namespace aeric.coroutinery
         }
 
         //Set the layer of a coroutine
-        public void SetCoroutineLayer(CoroutineHandle handle, int layer) {
+        public void SetCoroutineLayer(CoroutineHandle handle, int layer)
+        {
             var layerHandleList = GetCoroutinesByLayerNoCopy(layer);
             layerHandleList.Add(handle);
         }
 
         //Get the layer of a coroutine
-        public int GetCoroutineLayer(CoroutineHandle handle) 
+        public int GetCoroutineLayer(CoroutineHandle handle)
         {
             //Look at layer lists and return layer if handle exists in any of them
             foreach (var layerList in _layers)
@@ -815,7 +819,7 @@ namespace aeric.coroutinery
         }
 
         //Get the paused state of a coroutine
-        public bool GetCoroutinePaused(CoroutineHandle handle) 
+        public bool GetCoroutinePaused(CoroutineHandle handle)
         {
             CoroutineData c = GetCoroutineByHandle(handle);
             if (c == null) return false;//TODO: error
@@ -823,11 +827,9 @@ namespace aeric.coroutinery
             return c._paused;
         }
 
-        //Get the active state of a coroutine
-        public bool GetCoroutineActive(CoroutineHandle handle) { return false; }
-
         //Set the callback for whendd a coroutine is stopped
-        public void SetCoroutineOnStop(CoroutineHandle handle, Action callback) {
+        public void SetCoroutineOnStop(CoroutineHandle handle, Action callback)
+        {
             CoroutineData c = GetCoroutineByHandle(handle);
             if (c == null) return;//TODO: error
             c._stopAction = callback;
@@ -835,7 +837,7 @@ namespace aeric.coroutinery
 
         private CoroutineData GetCoroutineByHandle(CoroutineHandle handle)
         {
-            foreach(var c in _coroutines)
+            foreach (var c in _coroutines)
             {
                 if (c._handle._id == handle._id) return c;
             }
@@ -843,7 +845,8 @@ namespace aeric.coroutinery
         }
 
         //Set the callback for when a coroutine is finished  
-        public void SetCoroutineOnFinished(CoroutineHandle handle, Action callback) {
+        public void SetCoroutineOnFinished(CoroutineHandle handle, Action callback)
+        {
             CoroutineData c = GetCoroutineByHandle(handle);
             if (c == null) return;//TODO: error
             c._finishedAction = callback;
@@ -855,8 +858,6 @@ namespace aeric.coroutinery
         {
             if (_updater == null)
             {
-                //TODO: only in play mode?
-                //TODO: yuck
                 GameObject instanceHome = GameObject.Find("CoroutineUpdater");
 
                 if (instanceHome == null)
@@ -893,7 +894,7 @@ namespace aeric.coroutinery
 
         public CoroutineHandle GetCoroutineHandle(IEnumerator enumerator)
         {
-            foreach(var c in _coroutines)
+            foreach (var c in _coroutines)
             {
                 if (c._enumerator == enumerator) return c._handle;
             }
@@ -949,7 +950,7 @@ namespace aeric.coroutinery
 
         public List<CoroutineHandle> GetCoroutineStack(CoroutineHandle coroutineHandle)
         {
-            List<CoroutineHandle > stack = new List<CoroutineHandle>();
+            List<CoroutineHandle> stack = new List<CoroutineHandle>();
 
             //first get to the root coroutine and then walk down the stack
             CoroutineHandle rootCoroutine = coroutineHandle;
@@ -989,7 +990,7 @@ namespace aeric.coroutinery
 
         public CoroutineHandle GetCoroutineParent(CoroutineHandle currentHandle)
         {
-            foreach(var c in _coroutines)
+            foreach (var c in _coroutines)
             {
                 if (c._state == CoroutineState.Waiting_Coroutine && c._waitCoroutineId == currentHandle._id)
                 {
@@ -1039,7 +1040,7 @@ namespace aeric.coroutinery
 
         public void StepCoroutines(List<CoroutineHandle> coroutineHandles)
         {
-            foreach(var co in coroutineHandles)
+            foreach (var co in coroutineHandles)
             {
                 var c = GetCoroutineByHandle(co);
                 if (c == null) continue;

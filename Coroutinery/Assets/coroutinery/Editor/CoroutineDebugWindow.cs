@@ -10,15 +10,15 @@ namespace aeric.coroutinery
 {
     public class CoroutineDebugWindow : EditorWindow
     {
-        private const string IconPath_Base     = "Assets/coroutinery/Editor/Resources/";
+        private const string IconPath_Base = "Assets/coroutinery/Editor/Resources/";
         private const string IconPath_StackPtr = IconPath_Base + "aeric_stack_ptr.png";
         private const string IconPath_Selected = IconPath_Base + "aeric_selected.png";
-        private const string IconPath_Help     = IconPath_Base + "aeric_help.png";
-        private const string IconPath_Play     = IconPath_Base + "aeric_play.png";
-        private const string IconPath_Stop     = IconPath_Base + "aeric_stop.png";
-        private const string IconPath_Step     = IconPath_Base + "aeric_step.png";
-        private const string IconPath_Pause    = IconPath_Base + "aeric_pause.png";
-        private const string IconPath_Reset    = IconPath_Base + "aeric_reset.png";
+        private const string IconPath_Help = IconPath_Base + "aeric_help.png";
+        private const string IconPath_Play = IconPath_Base + "aeric_play.png";
+        private const string IconPath_Stop = IconPath_Base + "aeric_stop.png";
+        private const string IconPath_Step = IconPath_Base + "aeric_step.png";
+        private const string IconPath_Pause = IconPath_Base + "aeric_pause.png";
+        private const string IconPath_Reset = IconPath_Base + "aeric_reset.png";
         private const string HelpUrl = "http://aeric.games/rwnd/api/html/index.html";
         private const string WindowTitle = "Coroutine Debugger";
 
@@ -100,7 +100,7 @@ namespace aeric.coroutinery
         GameObject[] lastSelectedObjectss;
 
         void Update()
-        {            
+        {
             //check for conditions that should cause a repaint
             if (EditorApplication.isPlaying && (this.hasFocus || (DateTime.Now - lastRepaint).TotalMilliseconds > 1000))
             {
@@ -130,11 +130,11 @@ namespace aeric.coroutinery
                     Repaint();
                 }
             }
-            
+
         }
 
         private void DrawHelpButton(float windowWidth)
-        { 
+        {
             Texture2D helpIcon = LoadCachedTexture(IconPath_Help);
             GUIStyle style2 = new GUIStyle(GUI.skin.button);
             style2.margin = new RectOffset(0, 0, 0, 0);
@@ -151,7 +151,7 @@ namespace aeric.coroutinery
 
         bool clearedSearch = false;
         private Vector2 coroutineStackScrollPosition;
-       
+
         private Dictionary<string, GUIStyle> cachedGUIStyles = new Dictionary<string, GUIStyle>();
 
         internal GUIStyle GetGUIStyle(string styleName)
@@ -236,7 +236,7 @@ namespace aeric.coroutinery
 
                     EditorGUILayout.LabelField("Coroutine Stack");
 
-                    var listScrollViewScope = new EditorGUILayout.ScrollViewScope(coroutineStackScrollPosition, GUILayout.Height(stackHeight+6), GUILayout.ExpandHeight(false));
+                    var listScrollViewScope = new EditorGUILayout.ScrollViewScope(coroutineStackScrollPosition, GUILayout.Height(stackHeight + 6), GUILayout.ExpandHeight(false));
                     using (listScrollViewScope)
                     {
                         coroutineStackScrollPosition = listScrollViewScope.scrollPosition;
@@ -383,7 +383,7 @@ namespace aeric.coroutinery
                                 }
 
                                 if (filterOnSelection)
-                                { 
+                                {
                                     List<CoroutineHandle> selectionCoroutines = new List<CoroutineHandle>();
 
                                     //get the selected objects from the hierarchy
@@ -516,7 +516,7 @@ namespace aeric.coroutinery
                 }//end area scope
             }//end horizontal scope      
         }
-        
+
 
         private void AddSelectedCoroutine(CoroutineHandle coroutineHandle)
         {
@@ -567,11 +567,11 @@ namespace aeric.coroutinery
             {
                 sourceInfo = CoroutineManager.Instance.GetCoroutineSourceInfo(coroutineHandles[0], _debugInfo);
             }
- 
+
             using (new EditorGUILayout.VerticalScope())
             {
                 string prettyName = string.Empty;
-                
+
                 if (selectedCoroutines.Count == 1)
                 {
                     var coroutineHandle = selectedCoroutines[0];
@@ -581,7 +581,7 @@ namespace aeric.coroutinery
                 {
                     prettyName = "Multiple Coroutines Selected";
                 }
-                
+
                 EditorGUILayout.LabelField(prettyName);
 
                 //Status toolbar
@@ -680,7 +680,7 @@ namespace aeric.coroutinery
                         Rect dividorRect = EditorGUILayout.GetControlRect(GUILayout.Height(2 + 4));
                         dividorRect = new Rect(0, dividorRect.y + 2, debugInfoAreaWidth, 1);
                         DrawDividor(dividorRect);
-                        
+
                         //what is the coroutine waiting on?
                         if (c.Current == null)
                         {

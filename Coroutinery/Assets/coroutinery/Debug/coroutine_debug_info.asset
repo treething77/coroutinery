@@ -18,17 +18,17 @@ MonoBehaviour:
     - sourceUrl: Assets\coroutinery\Scripts\CoroutineManager.cs
       typeName: <EndOfFrameRunner>d__2
       typeNamespace: aeric.coroutinery
-      stateSourcePoints: 66000000
+      stateSourcePoints: 64000000
       outerTypeName: CoroutineUpdater
     - sourceUrl: Assets\coroutinery\Examples\RobotBattle\MoveTarget.cs
       typeName: <Bounce>d__11
       typeNamespace: aeric.coroutinery_demos
-      stateSourcePoints: 370000004400000047000000
+      stateSourcePoints: 3a000000470000004a000000
       outerTypeName: MoveTarget
     - sourceUrl: Assets\coroutinery\Examples\RobotBattle\MoveTarget.cs
       typeName: <ScaleUp>d__13
       typeNamespace: aeric.coroutinery_demos
-      stateSourcePoints: 5a0000006000000066000000
+      stateSourcePoints: 60000000660000006c000000
       outerTypeName: MoveTarget
     - sourceUrl: Assets\coroutinery\Examples\DeepStack\DeepStackTest.cs
       typeName: <RootCoroutine>d__4
@@ -48,7 +48,7 @@ MonoBehaviour:
     - sourceUrl: Assets\coroutinery\Examples\Emulation\UnityEmulationTest.cs
       typeName: <NestedTest>d__8
       typeNamespace: aeric.demos
-      stateSourcePoints: 2b0000002f0000003100000033000000360000003b0000003d000000420000004400000049000000
+      stateSourcePoints: 2a0000002e0000003000000032000000350000003a0000003c000000410000004300000048000000
       outerTypeName: UnityEmulationTest
     - sourceUrl: Assets\coroutinery\Examples\Emulation\UnityEmulationTest.cs
       typeName: <BreakTest>d__9
@@ -58,27 +58,27 @@ MonoBehaviour:
     - sourceUrl: Assets\coroutinery\Examples\Emulation\UnityEmulationTest.cs
       typeName: <SpinIt>d__10
       typeNamespace: aeric.demos
-      stateSourcePoints: 560000005b000000610000006a00000078000000
+      stateSourcePoints: 550000005a000000600000006900000077000000
       outerTypeName: UnityEmulationTest
     - sourceUrl: Assets\coroutinery\Examples\Emulation\UnityEmulationTest.cs
       typeName: <MoveIt>d__11
       typeNamespace: aeric.demos
-      stateSourcePoints: 7e00000083000000860000008b000000
+      stateSourcePoints: 7d00000082000000850000008a000000
       outerTypeName: UnityEmulationTest
     - sourceUrl: Assets\coroutinery\Examples\LabelsContextTags\TagLayerSetup.cs
       typeName: <SpinIt>d__6
       typeNamespace: aeric.demos
-      stateSourcePoints: 56000000
+      stateSourcePoints: 55000000
       outerTypeName: TagLayerSetup
     - sourceUrl: Assets\coroutinery\Examples\LabelsContextTags\TagLayerSetup.cs
       typeName: <MoveIt>d__7
       typeNamespace: aeric.demos
-      stateSourcePoints: 5b0000006a0000006d000000
+      stateSourcePoints: 5a000000690000006c000000
       outerTypeName: TagLayerSetup
     - sourceUrl: Assets\coroutinery\Examples\Pause\PauseTest.cs
       typeName: <MoveIt>d__4
       typeNamespace: aeric.demos
-      stateSourcePoints: 2e000000
+      stateSourcePoints: 2b000000
       outerTypeName: PauseTest
   - assemblyName: Assembly-CSharp-Editor
     sourceMapping: []
@@ -278,4 +278,6 @@ MonoBehaviour:
       stateSourcePoints: 20000000
       outerTypeName: CustomCoroutineWrapper
   - assemblyName: DTT.RuntimeUtilities.Demo
+    sourceMapping: []
+  - assemblyName: asset-store-tools-editor
     sourceMapping: []

@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace aeric.coroutinery {
-    
-    //TODO: move to own file
+namespace aeric.coroutinery
+{
     [Serializable]
-    public class CoroutineSourceMapping {
+    public class CoroutineSourceMapping
+    {
         public string sourceUrl;
         public string typeName;
         public string typeNamespace;
@@ -24,7 +24,6 @@ namespace aeric.coroutinery {
         public string outerTypeName;
     }
 
-    //TODO: move to own file
     [Serializable]
     public class CoroutineAssemblySourceMappings
     {
@@ -51,18 +50,17 @@ namespace aeric.coroutinery {
 
             if (typeMapping == null)
             {
-                // return "No source mapping found for type " + type.Name + " in namespace " + type.Namespace;
+                Debug.Log("No source mapping found for type " + type.Name + " in namespace " + type.Namespace);
                 return null;
             }
 
             if (stateValue >= typeMapping.stateSourcePoints.Length)
             {
                 stateValue = 0;
-               // return "State value " + stateValue + " is out of range for type " + type.Name + " in namespace " + type.Namespace;
+                Debug.Log("State value " + stateValue + " is out of range for type " + type.Name + " in namespace " + type.Namespace);
             }
 
             int sourcePoint = typeMapping.stateSourcePoints[stateValue];
-            //return a tuple of the url and line number
 
             SourceInfo sourceInfo = new SourceInfo();
             sourceInfo.url = typeMapping.sourceUrl;
@@ -70,12 +68,12 @@ namespace aeric.coroutinery {
             sourceInfo.enumeratorTypeName = type.Name;
             sourceInfo.outerTypeName = typeMapping.outerTypeName;
 
-            return sourceInfo; 
+            return sourceInfo;
         }
     }
 
 
-    public class CoroutineDebugInfo : ScriptableObject 
+    public class CoroutineDebugInfo : ScriptableObject
     {
         //Get mapping from assembly name to source mapping
         public CoroutineAssemblySourceMappings GetAssemblySourceMapping(string assemblyName)

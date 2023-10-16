@@ -11,8 +11,6 @@ GameObject:
   - component: {fileID: 6258527854730304955}
   - component: {fileID: 6258527854730304953}
   - component: {fileID: 6258527854730304952}
-  - component: {fileID: 2300349871183612058}
-  - component: {fileID: 1373822709192919797}
   m_Layer: 0
   m_Name: CaptureVFX
   m_TagString: Untagged
@@ -4930,29 +4928,3 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &2300349871183612058
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6258527854730304954}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f9d2c00306f6e94baf413709da41ac4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  id: 0
---- !u!114 &1373822709192919797
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6258527854730304954}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 057b07e52284b3f4a861b137ccade03b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  id: 0
