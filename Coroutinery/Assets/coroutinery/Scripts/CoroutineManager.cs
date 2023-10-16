@@ -1048,5 +1048,34 @@ namespace aeric.coroutinery
             }
         }
 
+#if UNITY_EDITOR
+
+        [MenuItem("GameObject/Show GameObject Coroutines", priority = 11)]
+        static void ShowCoroutines(MenuCommand menuCommand)
+        {
+            GameObject parent = menuCommand.context as GameObject;
+            //enable the selection toggle and set the scene selection to this object (if it isn't already)
+            Selection.activeGameObject = parent;
+
+        }
+
+        [MenuItem("Assets/Show Script Coroutines")]
+        static void LogSelectedTransformName()
+        {
+            //show all coroutines that were launched from this script
+            var script = Selection.activeObject as MonoScript;
+            if (script == null) return;
+            //need to set the coroutines list to something custom and then only update it if the search parameters change
+        }
+
+        [MenuItem("Assets/Show Script Coroutines", true)]
+        static bool ValidateLogSelectedTransformName()
+        {
+            // Test if the selected asset is a script
+            return Selection.activeObject.GetType() == typeof(MonoScript);            
+        }
+
+#endif
+
     }
 }
