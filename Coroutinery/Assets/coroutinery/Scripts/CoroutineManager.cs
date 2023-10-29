@@ -83,6 +83,7 @@ namespace aeric.coroutinery
     {
         private CoroutineManager _manager;
 
+
         public void Initialize(CoroutineManager coroutineManager)
         {
             _manager = coroutineManager;
@@ -125,8 +126,9 @@ namespace aeric.coroutinery
             FixedUpdate,
             LateUpdate,
             EndOfFrame,
-            //    UpdatePending
         }
+
+        public const string BaseFolderGUID = "47ae5826acd6113499fc7bb79a135dca";
 
         private static CoroutineManager _manager;
 
@@ -148,7 +150,7 @@ namespace aeric.coroutinery
 
         private CoroutineUpdater _updater;
 
-        enum CoroutineState // 16 bits?
+        enum CoroutineState
         {
             Running,
             Finished,
@@ -183,7 +185,7 @@ namespace aeric.coroutinery
         private List<CoroutineData> _coroutines = new List<CoroutineData>();
 
         private List<CoroutineData> _killList = new List<CoroutineData>();//temp list of coroutines to kill
-        private List<CoroutineData> _startList = new List<CoroutineData>();//temp list of coroutines to start
+        private List<CoroutineData> _startList = new List<CoroutineData>();//temp list of coroutines to start 
 
 
         private Dictionary<string, List<CoroutineHandle>> _tags = new Dictionary<string, List<CoroutineHandle>>();
@@ -198,17 +200,16 @@ namespace aeric.coroutinery
 
         public static void CreateManager()
         {
-            //TODO: error + early out if not null
             _manager = new CoroutineManager();
         }
 
 
         public CoroutineManager()
         {
+            //cache the field info for WaitForSeconds
             waitForSecondValue = ReflectionExtensions.GetFieldInfo<float>(typeof(WaitForSeconds), "m_Seconds");
         }
 
-        //TODO: move static methods into own static class, purely for API?
         public static void RunCoroutines()
         {
             Instance.Run(RunPhase.Update);
@@ -1048,34 +1049,33 @@ namespace aeric.coroutinery
             }
         }
 
-#if UNITY_EDITOR
-
-        [MenuItem("GameObject/Show GameObject Coroutines", priority = 11)]
-        static void ShowCoroutines(MenuCommand menuCommand)
+        public List<CoroutineHandle> GetCoroutinesBySource(MonoScript script)
         {
-            GameObject parent = menuCommand.context as GameObject;
-            //enable the selection toggle and set the scene selection to this object (if it isn't already)
-            Selection.activeGameObject = parent;
+            List<CoroutineHandle> coroutineHandles = new List<CoroutineHandle>();
+            var debugInfo = CoroutineManager.LoadDebugInfo();
 
+            //get the file for the MonoScript
+            var scriptUrl = AssetDatabase.GetAssetPath(script).Replace('/', '\\');
+
+
+            foreach (var c in _coroutines)
+            {
+                var sourceInfo = GetCoroutineSourceInfo(c._handle, debugInfo);
+
+                string stackTrace = CoroutineManager.Instance.GetStackTrace(c._handle);
+
+                if (stackTrace.Contains(scriptUrl))
+                {
+                    coroutineHandles.Add(c._handle);
+                }
+            }
+
+            return coroutineHandles;
         }
 
-        [MenuItem("Assets/Show Script Coroutines")]
-        static void LogSelectedTransformName()
+        public bool CoroutineExists(CoroutineHandle coroutineHandle)
         {
-            //show all coroutines that were launched from this script
-            var script = Selection.activeObject as MonoScript;
-            if (script == null) return;
-            //need to set the coroutines list to something custom and then only update it if the search parameters change
+            return GetCoroutineByHandle(coroutineHandle) != null;
         }
-
-        [MenuItem("Assets/Show Script Coroutines", true)]
-        static bool ValidateLogSelectedTransformName()
-        {
-            // Test if the selected asset is a script
-            return Selection.activeObject.GetType() == typeof(MonoScript);            
-        }
-
-#endif
-
     }
 }

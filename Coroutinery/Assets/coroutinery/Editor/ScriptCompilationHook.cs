@@ -239,7 +239,9 @@ namespace aeric.coroutinery
         {
             //Load the asset that contains the coroutine debug info
             //Look at our default path
-            string defaultPath = "Assets/coroutinery/Debug/";
+            string baseFolderPath = AssetDatabase.GUIDToAssetPath(CoroutineManager.BaseFolderGUID);
+            string defaultPath = baseFolderPath + "/Debug/";
+
             string filename = "coroutine_debug_info.asset";
             string fullPath = defaultPath + filename;
             CoroutineDebugInfo debugAsset = AssetDatabase.LoadAssetAtPath<CoroutineDebugInfo>(fullPath);

@@ -77,7 +77,7 @@ namespace aeric.coroutinery_demos
         private void Update()
         {
             //lerp color back to the team color
-            _material.color = Color.Lerp(_material.color, RobotLevel._instance.GetTeamColor(CapturedTeamIndex), Time.deltaTime);
+            _material.color = Color.Lerp(_material.color, RobotLevel.Instance.GetTeamColor(CapturedTeamIndex), Time.deltaTime);
             transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one, Time.deltaTime);
 
             if (captureIndicatorTimer > 0.0f)

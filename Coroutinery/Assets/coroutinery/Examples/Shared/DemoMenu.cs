@@ -1,3 +1,5 @@
+using aeric.coroutinery;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,27 +12,32 @@ namespace aeric.coroutinery_demos
     {
         public void loadEmulation()
         {
-            SceneManager.LoadScene("Assets/coroutinery/Examples/Emulation/Emulation.unity");
+            string baseFolderPath = AssetDatabase.GUIDToAssetPath(CoroutineManager.BaseFolderGUID);
+            SceneManager.LoadScene(baseFolderPath + "/Examples/Emulation/Emulation.unity");
         }
 
         public void loadDeepStack()
         {
-            SceneManager.LoadScene("Assets/coroutinery/Examples/DeepStack/DeepStack.unity");
+            string baseFolderPath = AssetDatabase.GUIDToAssetPath(CoroutineManager.BaseFolderGUID);
+            SceneManager.LoadScene(baseFolderPath + "/Examples/DeepStack/DeepStack.unity");
         }
 
         public void loadLabelsContext()
         {
-            SceneManager.LoadScene("Assets/coroutinery/Examples/LabelsContextTags/LabelsContextTags.unity");
+            string baseFolderPath = AssetDatabase.GUIDToAssetPath(CoroutineManager.BaseFolderGUID);
+            SceneManager.LoadScene(baseFolderPath + "/Examples/LabelsContextTags/LabelsContextTags.unity");
         }
 
         public void loadPause()
         {
-            SceneManager.LoadScene("Assets/coroutinery/Examples/Pause/Pause.unity");
+            string baseFolderPath = AssetDatabase.GUIDToAssetPath(CoroutineManager.BaseFolderGUID);
+            SceneManager.LoadScene(baseFolderPath + "/Examples/Pause/Pause.unity");
         }
 
         public void loadRobots()
         {
-            SceneManager.LoadScene("Assets/coroutinery/Examples/RobotBattle/RobotBattle.unity");
+            string baseFolderPath = AssetDatabase.GUIDToAssetPath(CoroutineManager.BaseFolderGUID);
+            SceneManager.LoadScene(baseFolderPath + "/Examples/RobotBattle/RobotBattle.unity");
         }
     }
 }

@@ -7,7 +7,17 @@ namespace aeric.coroutinery_demos
 {
     public class RobotLevel : MonoBehaviour
     {
-        public static RobotLevel _instance;
+        private static RobotLevel _instance;
+
+        public static RobotLevel Instance { 
+            get { 
+                //do the expensive search if we don't have a cached instance for some reason  
+                //this can happen due to recompilation for example (causes domain reload)  
+                if (_instance == null) 
+                    _instance = FindObjectOfType<RobotLevel>();
+                return _instance; 
+            } 
+        }
 
         public GameObject targetRoot;
         public List<RobotTeam> _robotTeams;

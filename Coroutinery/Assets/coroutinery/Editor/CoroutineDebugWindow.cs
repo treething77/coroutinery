@@ -10,7 +10,7 @@ namespace aeric.coroutinery
 {
     public class CoroutineDebugWindow : EditorWindow
     {
-        private const string IconPath_Base = "Assets/coroutinery/Editor/Resources/";
+        private const string IconPath_Base = "/Editor/Resources/";
         private const string IconPath_StackPtr = IconPath_Base + "aeric_stack_ptr.png";
         private const string IconPath_Selected = IconPath_Base + "aeric_selected.png";
         private const string IconPath_Help = IconPath_Base + "aeric_help.png";
@@ -46,15 +46,18 @@ namespace aeric.coroutinery
 
         private static Texture2D LoadCachedTexture(string texturePath)
         {
-            if (_textureCache.ContainsKey(texturePath))
+            string baseFolderPath = AssetDatabase.GUIDToAssetPath(CoroutineManager.BaseFolderGUID);
+            string fullTexturePath = baseFolderPath + "/" + texturePath;
+
+            if (_textureCache.ContainsKey(fullTexturePath))
             {
-                return _textureCache[texturePath];
+                return _textureCache[fullTexturePath];
             }
 
-            Texture2D texture = EditorResources.Load<Texture2D>(texturePath);
+            Texture2D texture = EditorResources.Load<Texture2D>(fullTexturePath);
             if (texture != null)
             {
-                _textureCache.Add(texturePath, texture);
+                _textureCache.Add(fullTexturePath, texture);
             }
             return texture;
         }
@@ -67,7 +70,11 @@ namespace aeric.coroutinery
         }
 
         FilterMode filterMode = FilterMode.FILTER_NAME;
-        bool filterOnSelection = false;
+        static bool filterOnSelection = false;
+        static string searchContents = string.Empty;
+        static List<CoroutineHandle> coroutines = new List<CoroutineHandle>();
+
+        bool clearedSearch = false;
 
         CoroutineDebugInfo _debugInfo = null;
 
@@ -83,9 +90,17 @@ namespace aeric.coroutinery
 
         void OnGUI()
         {
+            if (coroutines == null)
+                coroutines = new List<CoroutineHandle>();
+
             //get the EditorWindow dimensions
             float windowWidth = this.position.width;
             float windowHeight = this.position.height;
+
+            if (_debugInfo == null)
+            {
+                _debugInfo = CoroutineManager.LoadDebugInfo();
+            }
 
             DrawLeftPane(windowHeight);
 
@@ -147,12 +162,12 @@ namespace aeric.coroutinery
             }
         }
 
-        string searchContents = string.Empty;
-
-        bool clearedSearch = false;
         private Vector2 coroutineStackScrollPosition;
 
         private Dictionary<string, GUIStyle> cachedGUIStyles = new Dictionary<string, GUIStyle>();
+
+        //If this is set then the selection will not be changed until the user changes the search options
+        private static bool customSelection;
 
         internal GUIStyle GetGUIStyle(string styleName)
         {
@@ -209,11 +224,6 @@ namespace aeric.coroutinery
                 using (scrollViewScope)
                 {
                     debugInfoScrollPosition = scrollViewScope.scrollPosition;
-
-                    if (_debugInfo == null)
-                    {
-                        _debugInfo = CoroutineManager.LoadDebugInfo();
-                    }
 
                     if (selectedCoroutines.Count > 0)
                     {
@@ -313,10 +323,18 @@ namespace aeric.coroutinery
                             arraytabContent[i] = new GUIContent(tabOptions[i], tabTooltips[i]);
                         }
 
-                        filterMode = (FilterMode)GUILayout.Toolbar((int)filterMode, arraytabContent, GUILayout.MaxWidth(leftPaneWidth * 0.3f));
+                        FilterMode newFilterMode = (FilterMode)GUILayout.Toolbar((int)filterMode, arraytabContent, GUILayout.MaxWidth(leftPaneWidth * 0.3f));
 
                         GUILayout.FlexibleSpace();
-                        filterOnSelection = EditorGUILayout.ToggleLeft(new GUIContent("Selection", "Limit the search to coroutines that have a GameObject context that is included in the scene selection"), filterOnSelection, GUILayout.MaxWidth(leftPaneWidth * 0.3f));
+                        var newFilterOnSelection = EditorGUILayout.ToggleLeft(new GUIContent("Selection", "Limit the search to coroutines that have a GameObject context that is included in the scene selection"), filterOnSelection, GUILayout.MaxWidth(leftPaneWidth * 0.3f));
+
+                        if (filterMode != newFilterMode || filterOnSelection != newFilterOnSelection)
+                        {
+                            filterMode = newFilterMode;
+                            filterOnSelection = newFilterOnSelection;
+                            customSelection = false;
+                            searchContents = string.Empty;
+                        }
                     }
 
                     using (new EditorGUILayout.VerticalScope())
@@ -339,8 +357,7 @@ namespace aeric.coroutinery
 
                         GUI.SetNextControlName("coroutinerysearchfield");
 
-                        //TODO: different search text per mode
-                        searchContents = EditorGUI.TextField(rect, searchContents, EditorStyles.toolbarSearchField);
+                        string newSearchContents = EditorGUI.TextField(rect, searchContents, EditorStyles.toolbarSearchField);
 
                         GUI.SetNextControlName("searchcancelbutton");
                         if (GUI.Button(position, GUIContent.none, !empty ? cancelButtonStyle : emptyCancelButtonStyle))
@@ -358,13 +375,23 @@ namespace aeric.coroutinery
                             EditorGUI.FocusTextInControl("coroutinerysearchfield");
                         }
 
+                        if (clearedSearch)
+                        {
+                            searchContents = string.Empty;
+                            customSelection = false;
+                        }
+                        else if (newSearchContents != searchContents)
+                        {
+                            if (customSelection) searchContents = string.Empty;
+                            else                 searchContents = newSearchContents;
+                            customSelection = false;
+                        }
+
                         //draw the dividor
                         Rect dividorRect = EditorGUILayout.GetControlRect(GUILayout.Height(separatorWidth + 4));
                         dividorRect = new Rect(0, dividorRect.y + 2, leftPaneWidth, 1);
                         DrawDividor(dividorRect);
-
-                        List<CoroutineHandle> coroutines = new List<CoroutineHandle>();
-
+                      
                         var listScrollViewScope = new EditorGUILayout.ScrollViewScope(coroutineListScrollPosition);
                         using (listScrollViewScope)
                         {
@@ -372,29 +399,43 @@ namespace aeric.coroutinery
 
                             if (EditorApplication.isPlaying)
                             {
-                                switch (filterMode)
+                                if (!customSelection)
                                 {
-                                    case FilterMode.FILTER_TAG:
-                                        coroutines = CoroutineManager.Instance.GetCoroutinesByTag(searchContents);
-                                        break;
-                                    case FilterMode.FILTER_NAME:
-                                        coroutines = CoroutineManager.Instance.GetCoroutinesByName(searchContents, _debugInfo);
-                                        break;
-                                }
-
-                                if (filterOnSelection)
-                                {
-                                    List<CoroutineHandle> selectionCoroutines = new List<CoroutineHandle>();
-
-                                    //get the selected objects from the hierarchy
-                                    var selectedObjects = Selection.gameObjects;
-                                    foreach (var go in selectedObjects)
+                                    switch (filterMode)
                                     {
-                                        selectionCoroutines.AddRange(CoroutineManager.Instance.GetCoroutinesByContext(go));
+                                        case FilterMode.FILTER_TAG:
+                                            coroutines = CoroutineManager.Instance.GetCoroutinesByTag(searchContents);
+                                            break;
+                                        case FilterMode.FILTER_NAME:
+                                            coroutines = CoroutineManager.Instance.GetCoroutinesByName(searchContents, _debugInfo);
+                                            break;
                                     }
 
-                                    //filter the coroutines list by the selectionCoroutines list
-                                    coroutines = coroutines.FindAll((CoroutineHandle handle) => { return selectionCoroutines.Contains(handle); });
+                                    if (filterOnSelection)
+                                    {
+                                        List<CoroutineHandle> selectionCoroutines = new List<CoroutineHandle>();
+
+                                        //get the selected objects from the hierarchy
+                                        var selectedObjects = Selection.gameObjects;
+                                        foreach (var go in selectedObjects)
+                                        {
+                                            selectionCoroutines.AddRange(CoroutineManager.Instance.GetCoroutinesByContext(go));
+                                        }
+
+                                        //filter the coroutines list by the selectionCoroutines list
+                                        coroutines = coroutines.FindAll((CoroutineHandle handle) => { return selectionCoroutines.Contains(handle); });
+                                    }
+                                }
+                                else
+                                {
+                                    //since the coroutines list hasn't changed, verify that each of them still exists
+                                    for (int i = coroutines.Count - 1; i >= 0; i--)
+                                    {
+                                        if (!CoroutineManager.Instance.CoroutineExists(coroutines[i]))
+                                        {
+                                            coroutines.RemoveAt(i);
+                                        }
+                                    }
                                 }
 
                                 //Detect mouse clicks within the scrollview and determine which item in the list was clicked on
@@ -885,5 +926,48 @@ namespace aeric.coroutinery
                 }//end vertical scope 
             }
         }
+
+
+#if UNITY_EDITOR
+
+        [MenuItem("GameObject/Show GameObject Coroutines", priority = 11)]
+        static void ShowCoroutines(MenuCommand menuCommand)
+        {
+            filterOnSelection = true;
+            searchContents = "{custom selection}";
+
+            customSelection = true;
+            coroutines = new List<CoroutineHandle>();
+            var selectedObjects = Selection.gameObjects;
+            foreach (var go in selectedObjects)
+            {
+                coroutines.AddRange(CoroutineManager.Instance.GetCoroutinesByContext(go));
+            }
+        }
+
+        [MenuItem("Assets/Show Script Coroutines")]
+        static void ShowScriptCoroutines()
+        {
+            //show all coroutines that were launched from this script
+            var script = Selection.activeObject as MonoScript;
+            if (script == null) return;
+            //need to set the coroutines list to something custom and then only update it if the search parameters change
+            customSelection = true;
+            searchContents = "{custom - " + script.GetClass().Name + "}";
+
+            //TODO: multi-selection?
+
+            //get all coroutines that were launched from this script
+            coroutines = CoroutineManager.Instance.GetCoroutinesBySource(script);
+        }
+
+        [MenuItem("Assets/Show Script Coroutines", true)]
+        static bool ValidateShowScriptCoroutines()
+        {
+            // Test if the selected asset is a script
+            return Application.isPlaying && Selection.activeObject.GetType() == typeof(MonoScript);
+        }
+
+#endif
     }
 }
