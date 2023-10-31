@@ -1,0 +1,539 @@
+\doxysection{aeric.\+coroutinery.\+Coroutine\+Manager Class Reference}
+\hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager}{}\label{classaeric_1_1coroutinery_1_1_coroutine_manager}\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_af16c6f25bf484cdc7b06a618e468d1a9}{Run\+Phase}} \{ \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_af16c6f25bf484cdc7b06a618e468d1a9a06933067aafd48425d67bcb01bba5cb6}{Update}}
+, \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_af16c6f25bf484cdc7b06a618e468d1a9a9c1ca4069e206318b33ef896d3dd204e}{Fixed\+Update}}
+, \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_af16c6f25bf484cdc7b06a618e468d1a9a2609005edfde618c70f2140bb3e9b7c2}{Late\+Update}}
+, \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_af16c6f25bf484cdc7b06a618e468d1a9abec48f8a60537f06aa241b89f125c7f6}{End\+Of\+Frame}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a7e8944edd9ac0ed02404eab2147de836}{Coroutine\+Manager}} ()
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a3a4bff2ada3461c1bfa63dd9daf07f65}{Run\+End\+Of\+Frame}} ()
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a27b0f2f86d5a1ade75d707d58ac60c39}{Run\+Fixed\+Update}} ()
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_abf81f0a372ffae5967b4d12be9c7f0be}{Run\+Late\+Update}} ()
+\item 
+string \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a0ab9a1704880e7b8df16c4f5dab97c50}{Get\+Stack\+Trace}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} handle)
+\item 
+\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a92095a4cca89ecc125af414bf6da42ef}{Start}} (IEnumerator coroutine, \mbox{\hyperlink{_coroutine_manager_8cs_aef19bab18b9814edeef255c43e4f6bbc}{Object}} context=null, string tag=null, int layer=0)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a7adf3c974415a906c441dc1c157ff70d}{Stop\+Coroutine}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} handle, bool stop\+Child=true)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_afca5edb44ddd0ed2bd0f2807b91f4966}{Stop\+Coroutines}} (List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ coroutines)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a36b824546fb754346966878df5ef3dd3}{Stop\+All\+Coroutines}} ()
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_aab4db7b5a79f08721e7535de38ba0594}{Stop\+Coroutines\+By\+Tag}} (string tag)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a51bef19d90d30de4b21f54817be9d66c}{Stop\+Coroutines\+By\+Layer}} (int layer)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a91595c464b7892ee6ba3c141a13e2a60}{Stop\+Coroutines\+By\+Context}} (\mbox{\hyperlink{_coroutine_manager_8cs_aef19bab18b9814edeef255c43e4f6bbc}{Object}} context)
+\item 
+List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_ac4fb15e2f791beed527749c9ce04925c}{Get\+Coroutines\+By\+Tag}} (string tag)
+\item 
+List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_aaee722c81a3079310ac7425698195405}{Get\+Coroutines\+By\+Tag\+No\+Copy}} (string tag)
+\item 
+List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_abf4c7b57c96ebc93a48c2edaabaf2769}{Get\+Coroutines\+By\+Layer}} (int layer)
+\item 
+List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_abffeedcde6e1afb793c27565838bd1b2}{Get\+Coroutines\+By\+Layer\+No\+Copy}} (int layer)
+\item 
+List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_ac74a047f917b1a9ac0be431d1d822f22}{Get\+Coroutines\+By\+Context}} (\mbox{\hyperlink{_coroutine_manager_8cs_aef19bab18b9814edeef255c43e4f6bbc}{Object}} context)
+\item 
+List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_af195b4ac25537baeec5e6456643cfee9}{Get\+Coroutines\+By\+Context\+No\+Copy}} (\mbox{\hyperlink{_coroutine_manager_8cs_aef19bab18b9814edeef255c43e4f6bbc}{Object}} context)
+\item 
+List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a85bf9d8e066a606a9929278cafa41b64}{Get\+Coroutines\+By\+Name}} (string search, \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_debug_info}{Coroutine\+Debug\+Info}} debug\+Info)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a9bc931ebaa1a56ce7cdeeebb35723ec5}{Reset\+Coroutines}} (List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ coroutines)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a09027532c10dd6a7cef251fa3cfe7e2e}{Reset\+Coroutine}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} handle)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a03fe021575aaf9ccf40b96f0ed56d10e}{Pause\+Coroutine}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} handle, bool pause\+Child=true)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a8f3fa8eb65a4992ad40c653800d096fc}{Pause\+Coroutines\+By\+Tag}} (string tag)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_ae9bd4e671e3a2bf091bf01012b420cc8}{Pause\+Coroutines}} (List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ coroutines)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a7c91663a0cbe33a19d4267c5b2507ec9}{Pause\+Coroutines\+By\+Layer}} (int layer)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a3687acdbc0f606d722afdc3901c5226c}{Pause\+Coroutines\+By\+Context}} (\mbox{\hyperlink{_coroutine_manager_8cs_aef19bab18b9814edeef255c43e4f6bbc}{Object}} context)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a187877292e0dc3ab97bae8f8b536b91e}{Resume\+Coroutine}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} handle, bool resume\+Child=true)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a52f8dca434051a24091134408ce66b53}{Resume\+Coroutines}} (List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ coroutines)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a0b2e804a2b1b88086a4a4bb7414124b0}{Resume\+Coroutines\+By\+Tag}} (string tag)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_adcbe5bba0bdacb7f0add52899334aa4d}{Resume\+Coroutines\+By\+Layer}} (int layer)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a77d8092e6336dd04e862efd3f3edb665}{Resume\+Coroutines\+By\+Context}} (\mbox{\hyperlink{_coroutine_manager_8cs_aef19bab18b9814edeef255c43e4f6bbc}{Object}} context)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a87c8ba5c9504e4e1f62645bae27b3e03}{Set\+Coroutine\+Context}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} handle, \mbox{\hyperlink{_coroutine_manager_8cs_aef19bab18b9814edeef255c43e4f6bbc}{Object}} context)
+\item 
+\mbox{\hyperlink{_coroutine_manager_8cs_aef19bab18b9814edeef255c43e4f6bbc}{Object}} \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a4b9f0fa3757376016e78816b668b8e1f}{Get\+Coroutine\+Context}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} handle)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_ab44d2ced01c33e09b507989965560156}{Set\+Coroutine\+Tag}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} handle, string tag)
+\item 
+string \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_ab7b8577fa991ef474027b9ba7d5f5902}{Get\+Coroutine\+Tag}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} handle)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a43ef9aa06f704a9c8332373c66171b77}{Set\+Coroutine\+Layer}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} handle, int layer)
+\item 
+int \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a47090ced26c9a05dfdeafd3ecaafccff}{Get\+Coroutine\+Layer}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} handle)
+\item 
+bool \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a10d2042d12e657b10516595eec3b658c}{Get\+Coroutine\+Paused}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} handle)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_aafc83a452e4d5f23149c91e208163ad5}{Set\+Coroutine\+On\+Stop}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} handle, Action callback)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a3f6bce8fe13ad8166a59254853a6b9ba}{Set\+Coroutine\+On\+Finished}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} handle, Action callback)
+\item 
+\mbox{\hyperlink{classaeric_1_1coroutinery_1_1_source_info}{Source\+Info}} \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a36359561132615bc79ec3b7939b62fde}{Get\+Coroutine\+Source\+Info}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} coroutine\+Handle, \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_debug_info}{Coroutine\+Debug\+Info}} d)
+\item 
+IEnumerator \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a06d8ce4df1efe15c653be26b446c36f4}{Get\+Coroutine\+Enumerator}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} coroutine\+Handle)
+\item 
+\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a0a2c3ef2c15878a8b463ba907f7736e2}{Get\+Coroutine\+Handle}} (IEnumerator enumerator)
+\item 
+string \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a061567e89db1606bc486bb5e30b3dc65}{Get\+Coroutine\+Pretty\+Name}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} coroutine, \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_debug_info}{Coroutine\+Debug\+Info}} debug\+Info)
+\item 
+float \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_ae87fb03d8138a3e8d147656a23e72dd2}{Get\+Wait\+Time\+Remaining}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} coroutine\+Handle)
+\item 
+List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a1c63f331583140317d78e77015a9c375}{Get\+Coroutine\+Stack}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} coroutine\+Handle)
+\item 
+\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_abaca511453cdd1d7f10c0e38a29e13e2}{Get\+Coroutine\+Child}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} current\+Handle)
+\item 
+\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a04c626368f6f3141b0678829d9bd3feb}{Get\+Coroutine\+Parent}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} current\+Handle)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_aa40448e28bc0834e298a6c6eba1dfdc8}{Destroy\+Game\+Object\+With\+Coroutines}} (Game\+Object game\+Object)
+\item 
+void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_add74a42f9788b2b84fa92613da46208d}{Step\+Coroutines}} (List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ coroutine\+Handles)
+\item 
+List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a6ec745f73845210a0f78562f0651526b}{Get\+Coroutines\+By\+Source}} (Mono\+Script script)
+\item 
+bool \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a4fdc416e83a46de00624e3f2d42ab3e0}{Coroutine\+Exists}} (\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} coroutine\+Handle)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a2cf91d44c4e380d936d0394645b65911}{Create\+Manager}} ()
+\item 
+static void \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_ac74c7beb4b04bc074f3d65a56b4d0cc9}{Run\+Coroutines}} ()
+\item 
+static \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a2edd3629120f784219c62db9e8691674}{Start\+Coroutine}} (IEnumerator coroutine)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const string \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a17e0db773bbaa239707983db89fb71e3}{Base\+Folder\+GUID}} = \"{}47ae5826acd6113499fc7bb79a135dca\"{}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager}{Coroutine\+Manager}} \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a6e4dc630113f653fbd3c3a843d26edc5}{Instance}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+bool \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_a83848b76a6a8e7b0f7735c1e084223d6}{Break\+On\+Finished}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+bool \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_ae0c6148f8b6e1c5902d1f0b6abc88390}{Log\+Steps}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_af16c6f25bf484cdc7b06a618e468d1a9}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_af16c6f25bf484cdc7b06a618e468d1a9} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!RunPhase@{RunPhase}}
+\index{RunPhase@{RunPhase}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{RunPhase}{RunPhase}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager_af16c6f25bf484cdc7b06a618e468d1a9}{aeric.\+coroutinery.\+Coroutine\+Manager.\+Run\+Phase}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Update@{Update}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!Update@{Update}}}\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_af16c6f25bf484cdc7b06a618e468d1a9a06933067aafd48425d67bcb01bba5cb6}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_af16c6f25bf484cdc7b06a618e468d1a9a06933067aafd48425d67bcb01bba5cb6} 
+Update&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FixedUpdate@{FixedUpdate}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!FixedUpdate@{FixedUpdate}}}\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_af16c6f25bf484cdc7b06a618e468d1a9a9c1ca4069e206318b33ef896d3dd204e}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_af16c6f25bf484cdc7b06a618e468d1a9a9c1ca4069e206318b33ef896d3dd204e} 
+Fixed\+Update&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LateUpdate@{LateUpdate}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!LateUpdate@{LateUpdate}}}\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_af16c6f25bf484cdc7b06a618e468d1a9a2609005edfde618c70f2140bb3e9b7c2}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_af16c6f25bf484cdc7b06a618e468d1a9a2609005edfde618c70f2140bb3e9b7c2} 
+Late\+Update&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EndOfFrame@{EndOfFrame}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!EndOfFrame@{EndOfFrame}}}\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_af16c6f25bf484cdc7b06a618e468d1a9abec48f8a60537f06aa241b89f125c7f6}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_af16c6f25bf484cdc7b06a618e468d1a9abec48f8a60537f06aa241b89f125c7f6} 
+End\+Of\+Frame&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a7e8944edd9ac0ed02404eab2147de836}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a7e8944edd9ac0ed02404eab2147de836} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!CoroutineManager@{CoroutineManager}}
+\index{CoroutineManager@{CoroutineManager}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{CoroutineManager()}{CoroutineManager()}}
+{\footnotesize\ttfamily aeric.\+coroutinery.\+Coroutine\+Manager.\+Coroutine\+Manager (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a4fdc416e83a46de00624e3f2d42ab3e0}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a4fdc416e83a46de00624e3f2d42ab3e0} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!CoroutineExists@{CoroutineExists}}
+\index{CoroutineExists@{CoroutineExists}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{CoroutineExists()}{CoroutineExists()}}
+{\footnotesize\ttfamily bool aeric.\+coroutinery.\+Coroutine\+Manager.\+Coroutine\+Exists (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{coroutine\+Handle }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a2cf91d44c4e380d936d0394645b65911}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a2cf91d44c4e380d936d0394645b65911} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!CreateManager@{CreateManager}}
+\index{CreateManager@{CreateManager}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{CreateManager()}{CreateManager()}}
+{\footnotesize\ttfamily static void aeric.\+coroutinery.\+Coroutine\+Manager.\+Create\+Manager (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_aa40448e28bc0834e298a6c6eba1dfdc8}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_aa40448e28bc0834e298a6c6eba1dfdc8} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!DestroyGameObjectWithCoroutines@{DestroyGameObjectWithCoroutines}}
+\index{DestroyGameObjectWithCoroutines@{DestroyGameObjectWithCoroutines}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{DestroyGameObjectWithCoroutines()}{DestroyGameObjectWithCoroutines()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Destroy\+Game\+Object\+With\+Coroutines (\begin{DoxyParamCaption}\item[{Game\+Object}]{game\+Object }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_abaca511453cdd1d7f10c0e38a29e13e2}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_abaca511453cdd1d7f10c0e38a29e13e2} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutineChild@{GetCoroutineChild}}
+\index{GetCoroutineChild@{GetCoroutineChild}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutineChild()}{GetCoroutineChild()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutine\+Child (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{current\+Handle }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a4b9f0fa3757376016e78816b668b8e1f}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a4b9f0fa3757376016e78816b668b8e1f} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutineContext@{GetCoroutineContext}}
+\index{GetCoroutineContext@{GetCoroutineContext}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutineContext()}{GetCoroutineContext()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{_coroutine_manager_8cs_aef19bab18b9814edeef255c43e4f6bbc}{Object}} aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutine\+Context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{handle }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a06d8ce4df1efe15c653be26b446c36f4}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a06d8ce4df1efe15c653be26b446c36f4} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutineEnumerator@{GetCoroutineEnumerator}}
+\index{GetCoroutineEnumerator@{GetCoroutineEnumerator}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutineEnumerator()}{GetCoroutineEnumerator()}}
+{\footnotesize\ttfamily IEnumerator aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutine\+Enumerator (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{coroutine\+Handle }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a0a2c3ef2c15878a8b463ba907f7736e2}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a0a2c3ef2c15878a8b463ba907f7736e2} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutineHandle@{GetCoroutineHandle}}
+\index{GetCoroutineHandle@{GetCoroutineHandle}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutineHandle()}{GetCoroutineHandle()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutine\+Handle (\begin{DoxyParamCaption}\item[{IEnumerator}]{enumerator }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a47090ced26c9a05dfdeafd3ecaafccff}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a47090ced26c9a05dfdeafd3ecaafccff} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutineLayer@{GetCoroutineLayer}}
+\index{GetCoroutineLayer@{GetCoroutineLayer}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutineLayer()}{GetCoroutineLayer()}}
+{\footnotesize\ttfamily int aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutine\+Layer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{handle }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a04c626368f6f3141b0678829d9bd3feb}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a04c626368f6f3141b0678829d9bd3feb} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutineParent@{GetCoroutineParent}}
+\index{GetCoroutineParent@{GetCoroutineParent}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutineParent()}{GetCoroutineParent()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutine\+Parent (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{current\+Handle }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a10d2042d12e657b10516595eec3b658c}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a10d2042d12e657b10516595eec3b658c} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutinePaused@{GetCoroutinePaused}}
+\index{GetCoroutinePaused@{GetCoroutinePaused}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutinePaused()}{GetCoroutinePaused()}}
+{\footnotesize\ttfamily bool aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutine\+Paused (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{handle }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a061567e89db1606bc486bb5e30b3dc65}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a061567e89db1606bc486bb5e30b3dc65} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutinePrettyName@{GetCoroutinePrettyName}}
+\index{GetCoroutinePrettyName@{GetCoroutinePrettyName}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutinePrettyName()}{GetCoroutinePrettyName()}}
+{\footnotesize\ttfamily string aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutine\+Pretty\+Name (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{coroutine,  }\item[{\mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_debug_info}{Coroutine\+Debug\+Info}}}]{debug\+Info }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_ac74a047f917b1a9ac0be431d1d822f22}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_ac74a047f917b1a9ac0be431d1d822f22} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutinesByContext@{GetCoroutinesByContext}}
+\index{GetCoroutinesByContext@{GetCoroutinesByContext}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutinesByContext()}{GetCoroutinesByContext()}}
+{\footnotesize\ttfamily List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutines\+By\+Context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_coroutine_manager_8cs_aef19bab18b9814edeef255c43e4f6bbc}{Object}}}]{context }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_af195b4ac25537baeec5e6456643cfee9}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_af195b4ac25537baeec5e6456643cfee9} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutinesByContextNoCopy@{GetCoroutinesByContextNoCopy}}
+\index{GetCoroutinesByContextNoCopy@{GetCoroutinesByContextNoCopy}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutinesByContextNoCopy()}{GetCoroutinesByContextNoCopy()}}
+{\footnotesize\ttfamily List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutines\+By\+Context\+No\+Copy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_coroutine_manager_8cs_aef19bab18b9814edeef255c43e4f6bbc}{Object}}}]{context }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_abf4c7b57c96ebc93a48c2edaabaf2769}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_abf4c7b57c96ebc93a48c2edaabaf2769} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutinesByLayer@{GetCoroutinesByLayer}}
+\index{GetCoroutinesByLayer@{GetCoroutinesByLayer}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutinesByLayer()}{GetCoroutinesByLayer()}}
+{\footnotesize\ttfamily List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutines\+By\+Layer (\begin{DoxyParamCaption}\item[{int}]{layer }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_abffeedcde6e1afb793c27565838bd1b2}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_abffeedcde6e1afb793c27565838bd1b2} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutinesByLayerNoCopy@{GetCoroutinesByLayerNoCopy}}
+\index{GetCoroutinesByLayerNoCopy@{GetCoroutinesByLayerNoCopy}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutinesByLayerNoCopy()}{GetCoroutinesByLayerNoCopy()}}
+{\footnotesize\ttfamily List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutines\+By\+Layer\+No\+Copy (\begin{DoxyParamCaption}\item[{int}]{layer }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a85bf9d8e066a606a9929278cafa41b64}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a85bf9d8e066a606a9929278cafa41b64} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutinesByName@{GetCoroutinesByName}}
+\index{GetCoroutinesByName@{GetCoroutinesByName}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutinesByName()}{GetCoroutinesByName()}}
+{\footnotesize\ttfamily List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutines\+By\+Name (\begin{DoxyParamCaption}\item[{string}]{search,  }\item[{\mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_debug_info}{Coroutine\+Debug\+Info}}}]{debug\+Info }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a6ec745f73845210a0f78562f0651526b}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a6ec745f73845210a0f78562f0651526b} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutinesBySource@{GetCoroutinesBySource}}
+\index{GetCoroutinesBySource@{GetCoroutinesBySource}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutinesBySource()}{GetCoroutinesBySource()}}
+{\footnotesize\ttfamily List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutines\+By\+Source (\begin{DoxyParamCaption}\item[{Mono\+Script}]{script }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_ac4fb15e2f791beed527749c9ce04925c}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_ac4fb15e2f791beed527749c9ce04925c} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutinesByTag@{GetCoroutinesByTag}}
+\index{GetCoroutinesByTag@{GetCoroutinesByTag}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutinesByTag()}{GetCoroutinesByTag()}}
+{\footnotesize\ttfamily List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutines\+By\+Tag (\begin{DoxyParamCaption}\item[{string}]{tag }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_aaee722c81a3079310ac7425698195405}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_aaee722c81a3079310ac7425698195405} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutinesByTagNoCopy@{GetCoroutinesByTagNoCopy}}
+\index{GetCoroutinesByTagNoCopy@{GetCoroutinesByTagNoCopy}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutinesByTagNoCopy()}{GetCoroutinesByTagNoCopy()}}
+{\footnotesize\ttfamily List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutines\+By\+Tag\+No\+Copy (\begin{DoxyParamCaption}\item[{string}]{tag }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a36359561132615bc79ec3b7939b62fde}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a36359561132615bc79ec3b7939b62fde} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutineSourceInfo@{GetCoroutineSourceInfo}}
+\index{GetCoroutineSourceInfo@{GetCoroutineSourceInfo}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutineSourceInfo()}{GetCoroutineSourceInfo()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_source_info}{Source\+Info}} aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutine\+Source\+Info (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{coroutine\+Handle,  }\item[{\mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_debug_info}{Coroutine\+Debug\+Info}}}]{d }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a1c63f331583140317d78e77015a9c375}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a1c63f331583140317d78e77015a9c375} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutineStack@{GetCoroutineStack}}
+\index{GetCoroutineStack@{GetCoroutineStack}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutineStack()}{GetCoroutineStack()}}
+{\footnotesize\ttfamily List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$ aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutine\+Stack (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{coroutine\+Handle }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_ab7b8577fa991ef474027b9ba7d5f5902}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_ab7b8577fa991ef474027b9ba7d5f5902} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetCoroutineTag@{GetCoroutineTag}}
+\index{GetCoroutineTag@{GetCoroutineTag}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetCoroutineTag()}{GetCoroutineTag()}}
+{\footnotesize\ttfamily string aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Coroutine\+Tag (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{handle }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a0ab9a1704880e7b8df16c4f5dab97c50}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a0ab9a1704880e7b8df16c4f5dab97c50} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetStackTrace@{GetStackTrace}}
+\index{GetStackTrace@{GetStackTrace}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetStackTrace()}{GetStackTrace()}}
+{\footnotesize\ttfamily string aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Stack\+Trace (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{handle }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_ae87fb03d8138a3e8d147656a23e72dd2}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_ae87fb03d8138a3e8d147656a23e72dd2} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!GetWaitTimeRemaining@{GetWaitTimeRemaining}}
+\index{GetWaitTimeRemaining@{GetWaitTimeRemaining}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{GetWaitTimeRemaining()}{GetWaitTimeRemaining()}}
+{\footnotesize\ttfamily float aeric.\+coroutinery.\+Coroutine\+Manager.\+Get\+Wait\+Time\+Remaining (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{coroutine\+Handle }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a03fe021575aaf9ccf40b96f0ed56d10e}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a03fe021575aaf9ccf40b96f0ed56d10e} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!PauseCoroutine@{PauseCoroutine}}
+\index{PauseCoroutine@{PauseCoroutine}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{PauseCoroutine()}{PauseCoroutine()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Pause\+Coroutine (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{handle,  }\item[{bool}]{pause\+Child = {\ttfamily true} }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_ae9bd4e671e3a2bf091bf01012b420cc8}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_ae9bd4e671e3a2bf091bf01012b420cc8} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!PauseCoroutines@{PauseCoroutines}}
+\index{PauseCoroutines@{PauseCoroutines}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{PauseCoroutines()}{PauseCoroutines()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Pause\+Coroutines (\begin{DoxyParamCaption}\item[{List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$}]{coroutines }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a3687acdbc0f606d722afdc3901c5226c}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a3687acdbc0f606d722afdc3901c5226c} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!PauseCoroutinesByContext@{PauseCoroutinesByContext}}
+\index{PauseCoroutinesByContext@{PauseCoroutinesByContext}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{PauseCoroutinesByContext()}{PauseCoroutinesByContext()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Pause\+Coroutines\+By\+Context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_coroutine_manager_8cs_aef19bab18b9814edeef255c43e4f6bbc}{Object}}}]{context }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a7c91663a0cbe33a19d4267c5b2507ec9}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a7c91663a0cbe33a19d4267c5b2507ec9} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!PauseCoroutinesByLayer@{PauseCoroutinesByLayer}}
+\index{PauseCoroutinesByLayer@{PauseCoroutinesByLayer}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{PauseCoroutinesByLayer()}{PauseCoroutinesByLayer()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Pause\+Coroutines\+By\+Layer (\begin{DoxyParamCaption}\item[{int}]{layer }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a8f3fa8eb65a4992ad40c653800d096fc}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a8f3fa8eb65a4992ad40c653800d096fc} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!PauseCoroutinesByTag@{PauseCoroutinesByTag}}
+\index{PauseCoroutinesByTag@{PauseCoroutinesByTag}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{PauseCoroutinesByTag()}{PauseCoroutinesByTag()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Pause\+Coroutines\+By\+Tag (\begin{DoxyParamCaption}\item[{string}]{tag }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a09027532c10dd6a7cef251fa3cfe7e2e}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a09027532c10dd6a7cef251fa3cfe7e2e} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!ResetCoroutine@{ResetCoroutine}}
+\index{ResetCoroutine@{ResetCoroutine}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{ResetCoroutine()}{ResetCoroutine()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Reset\+Coroutine (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{handle }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a9bc931ebaa1a56ce7cdeeebb35723ec5}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a9bc931ebaa1a56ce7cdeeebb35723ec5} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!ResetCoroutines@{ResetCoroutines}}
+\index{ResetCoroutines@{ResetCoroutines}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{ResetCoroutines()}{ResetCoroutines()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Reset\+Coroutines (\begin{DoxyParamCaption}\item[{List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$}]{coroutines }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a187877292e0dc3ab97bae8f8b536b91e}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a187877292e0dc3ab97bae8f8b536b91e} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!ResumeCoroutine@{ResumeCoroutine}}
+\index{ResumeCoroutine@{ResumeCoroutine}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{ResumeCoroutine()}{ResumeCoroutine()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Resume\+Coroutine (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{handle,  }\item[{bool}]{resume\+Child = {\ttfamily true} }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a52f8dca434051a24091134408ce66b53}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a52f8dca434051a24091134408ce66b53} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!ResumeCoroutines@{ResumeCoroutines}}
+\index{ResumeCoroutines@{ResumeCoroutines}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{ResumeCoroutines()}{ResumeCoroutines()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Resume\+Coroutines (\begin{DoxyParamCaption}\item[{List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$}]{coroutines }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a77d8092e6336dd04e862efd3f3edb665}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a77d8092e6336dd04e862efd3f3edb665} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!ResumeCoroutinesByContext@{ResumeCoroutinesByContext}}
+\index{ResumeCoroutinesByContext@{ResumeCoroutinesByContext}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{ResumeCoroutinesByContext()}{ResumeCoroutinesByContext()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Resume\+Coroutines\+By\+Context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_coroutine_manager_8cs_aef19bab18b9814edeef255c43e4f6bbc}{Object}}}]{context }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_adcbe5bba0bdacb7f0add52899334aa4d}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_adcbe5bba0bdacb7f0add52899334aa4d} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!ResumeCoroutinesByLayer@{ResumeCoroutinesByLayer}}
+\index{ResumeCoroutinesByLayer@{ResumeCoroutinesByLayer}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{ResumeCoroutinesByLayer()}{ResumeCoroutinesByLayer()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Resume\+Coroutines\+By\+Layer (\begin{DoxyParamCaption}\item[{int}]{layer }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a0b2e804a2b1b88086a4a4bb7414124b0}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a0b2e804a2b1b88086a4a4bb7414124b0} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!ResumeCoroutinesByTag@{ResumeCoroutinesByTag}}
+\index{ResumeCoroutinesByTag@{ResumeCoroutinesByTag}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{ResumeCoroutinesByTag()}{ResumeCoroutinesByTag()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Resume\+Coroutines\+By\+Tag (\begin{DoxyParamCaption}\item[{string}]{tag }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_ac74c7beb4b04bc074f3d65a56b4d0cc9}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_ac74c7beb4b04bc074f3d65a56b4d0cc9} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!RunCoroutines@{RunCoroutines}}
+\index{RunCoroutines@{RunCoroutines}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{RunCoroutines()}{RunCoroutines()}}
+{\footnotesize\ttfamily static void aeric.\+coroutinery.\+Coroutine\+Manager.\+Run\+Coroutines (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a3a4bff2ada3461c1bfa63dd9daf07f65}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a3a4bff2ada3461c1bfa63dd9daf07f65} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!RunEndOfFrame@{RunEndOfFrame}}
+\index{RunEndOfFrame@{RunEndOfFrame}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{RunEndOfFrame()}{RunEndOfFrame()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Run\+End\+Of\+Frame (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a27b0f2f86d5a1ade75d707d58ac60c39}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a27b0f2f86d5a1ade75d707d58ac60c39} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!RunFixedUpdate@{RunFixedUpdate}}
+\index{RunFixedUpdate@{RunFixedUpdate}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{RunFixedUpdate()}{RunFixedUpdate()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Run\+Fixed\+Update (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_abf81f0a372ffae5967b4d12be9c7f0be}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_abf81f0a372ffae5967b4d12be9c7f0be} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!RunLateUpdate@{RunLateUpdate}}
+\index{RunLateUpdate@{RunLateUpdate}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{RunLateUpdate()}{RunLateUpdate()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Run\+Late\+Update (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a87c8ba5c9504e4e1f62645bae27b3e03}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a87c8ba5c9504e4e1f62645bae27b3e03} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!SetCoroutineContext@{SetCoroutineContext}}
+\index{SetCoroutineContext@{SetCoroutineContext}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{SetCoroutineContext()}{SetCoroutineContext()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Set\+Coroutine\+Context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{handle,  }\item[{\mbox{\hyperlink{_coroutine_manager_8cs_aef19bab18b9814edeef255c43e4f6bbc}{Object}}}]{context }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a43ef9aa06f704a9c8332373c66171b77}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a43ef9aa06f704a9c8332373c66171b77} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!SetCoroutineLayer@{SetCoroutineLayer}}
+\index{SetCoroutineLayer@{SetCoroutineLayer}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{SetCoroutineLayer()}{SetCoroutineLayer()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Set\+Coroutine\+Layer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{handle,  }\item[{int}]{layer }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a3f6bce8fe13ad8166a59254853a6b9ba}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a3f6bce8fe13ad8166a59254853a6b9ba} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!SetCoroutineOnFinished@{SetCoroutineOnFinished}}
+\index{SetCoroutineOnFinished@{SetCoroutineOnFinished}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{SetCoroutineOnFinished()}{SetCoroutineOnFinished()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Set\+Coroutine\+On\+Finished (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{handle,  }\item[{Action}]{callback }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_aafc83a452e4d5f23149c91e208163ad5}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_aafc83a452e4d5f23149c91e208163ad5} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!SetCoroutineOnStop@{SetCoroutineOnStop}}
+\index{SetCoroutineOnStop@{SetCoroutineOnStop}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{SetCoroutineOnStop()}{SetCoroutineOnStop()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Set\+Coroutine\+On\+Stop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{handle,  }\item[{Action}]{callback }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_ab44d2ced01c33e09b507989965560156}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_ab44d2ced01c33e09b507989965560156} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!SetCoroutineTag@{SetCoroutineTag}}
+\index{SetCoroutineTag@{SetCoroutineTag}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{SetCoroutineTag()}{SetCoroutineTag()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Set\+Coroutine\+Tag (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{handle,  }\item[{string}]{tag }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a92095a4cca89ecc125af414bf6da42ef}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a92095a4cca89ecc125af414bf6da42ef} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!Start@{Start}}
+\index{Start@{Start}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{Start()}{Start()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} aeric.\+coroutinery.\+Coroutine\+Manager.\+Start (\begin{DoxyParamCaption}\item[{IEnumerator}]{coroutine,  }\item[{\mbox{\hyperlink{_coroutine_manager_8cs_aef19bab18b9814edeef255c43e4f6bbc}{Object}}}]{context = {\ttfamily null},  }\item[{string}]{tag = {\ttfamily null},  }\item[{int}]{layer = {\ttfamily 0} }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a2edd3629120f784219c62db9e8691674}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a2edd3629120f784219c62db9e8691674} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!StartCoroutine@{StartCoroutine}}
+\index{StartCoroutine@{StartCoroutine}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{StartCoroutine()}{StartCoroutine()}}
+{\footnotesize\ttfamily static \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} aeric.\+coroutinery.\+Coroutine\+Manager.\+Start\+Coroutine (\begin{DoxyParamCaption}\item[{IEnumerator}]{coroutine }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_add74a42f9788b2b84fa92613da46208d}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_add74a42f9788b2b84fa92613da46208d} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!StepCoroutines@{StepCoroutines}}
+\index{StepCoroutines@{StepCoroutines}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{StepCoroutines()}{StepCoroutines()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Step\+Coroutines (\begin{DoxyParamCaption}\item[{List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$}]{coroutine\+Handles }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a36b824546fb754346966878df5ef3dd3}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a36b824546fb754346966878df5ef3dd3} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!StopAllCoroutines@{StopAllCoroutines}}
+\index{StopAllCoroutines@{StopAllCoroutines}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{StopAllCoroutines()}{StopAllCoroutines()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Stop\+All\+Coroutines (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a7adf3c974415a906c441dc1c157ff70d}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a7adf3c974415a906c441dc1c157ff70d} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!StopCoroutine@{StopCoroutine}}
+\index{StopCoroutine@{StopCoroutine}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{StopCoroutine()}{StopCoroutine()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Stop\+Coroutine (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}}}]{handle,  }\item[{bool}]{stop\+Child = {\ttfamily true} }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_afca5edb44ddd0ed2bd0f2807b91f4966}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_afca5edb44ddd0ed2bd0f2807b91f4966} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!StopCoroutines@{StopCoroutines}}
+\index{StopCoroutines@{StopCoroutines}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{StopCoroutines()}{StopCoroutines()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Stop\+Coroutines (\begin{DoxyParamCaption}\item[{List$<$ \mbox{\hyperlink{structaeric_1_1coroutinery_1_1_coroutine_handle}{Coroutine\+Handle}} $>$}]{coroutines }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a91595c464b7892ee6ba3c141a13e2a60}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a91595c464b7892ee6ba3c141a13e2a60} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!StopCoroutinesByContext@{StopCoroutinesByContext}}
+\index{StopCoroutinesByContext@{StopCoroutinesByContext}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{StopCoroutinesByContext()}{StopCoroutinesByContext()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Stop\+Coroutines\+By\+Context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_coroutine_manager_8cs_aef19bab18b9814edeef255c43e4f6bbc}{Object}}}]{context }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a51bef19d90d30de4b21f54817be9d66c}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a51bef19d90d30de4b21f54817be9d66c} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!StopCoroutinesByLayer@{StopCoroutinesByLayer}}
+\index{StopCoroutinesByLayer@{StopCoroutinesByLayer}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{StopCoroutinesByLayer()}{StopCoroutinesByLayer()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Stop\+Coroutines\+By\+Layer (\begin{DoxyParamCaption}\item[{int}]{layer }\end{DoxyParamCaption})}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_aab4db7b5a79f08721e7535de38ba0594}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_aab4db7b5a79f08721e7535de38ba0594} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!StopCoroutinesByTag@{StopCoroutinesByTag}}
+\index{StopCoroutinesByTag@{StopCoroutinesByTag}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{StopCoroutinesByTag()}{StopCoroutinesByTag()}}
+{\footnotesize\ttfamily void aeric.\+coroutinery.\+Coroutine\+Manager.\+Stop\+Coroutines\+By\+Tag (\begin{DoxyParamCaption}\item[{string}]{tag }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a17e0db773bbaa239707983db89fb71e3}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a17e0db773bbaa239707983db89fb71e3} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!BaseFolderGUID@{BaseFolderGUID}}
+\index{BaseFolderGUID@{BaseFolderGUID}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{BaseFolderGUID}{BaseFolderGUID}}
+{\footnotesize\ttfamily const string aeric.\+coroutinery.\+Coroutine\+Manager.\+Base\+Folder\+GUID = \"{}47ae5826acd6113499fc7bb79a135dca\"{}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a83848b76a6a8e7b0f7735c1e084223d6}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a83848b76a6a8e7b0f7735c1e084223d6} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!BreakOnFinished@{BreakOnFinished}}
+\index{BreakOnFinished@{BreakOnFinished}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{BreakOnFinished}{BreakOnFinished}}
+{\footnotesize\ttfamily bool aeric.\+coroutinery.\+Coroutine\+Manager.\+Break\+On\+Finished\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_a6e4dc630113f653fbd3c3a843d26edc5}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_a6e4dc630113f653fbd3c3a843d26edc5} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!Instance@{Instance}}
+\index{Instance@{Instance}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{Instance}{Instance}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classaeric_1_1coroutinery_1_1_coroutine_manager}{Coroutine\+Manager}} aeric.\+coroutinery.\+Coroutine\+Manager.\+Instance\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [get]}}
+
+\Hypertarget{classaeric_1_1coroutinery_1_1_coroutine_manager_ae0c6148f8b6e1c5902d1f0b6abc88390}\label{classaeric_1_1coroutinery_1_1_coroutine_manager_ae0c6148f8b6e1c5902d1f0b6abc88390} 
+\index{aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}!LogSteps@{LogSteps}}
+\index{LogSteps@{LogSteps}!aeric.coroutinery.CoroutineManager@{aeric.coroutinery.CoroutineManager}}
+\doxysubsubsection{\texorpdfstring{LogSteps}{LogSteps}}
+{\footnotesize\ttfamily bool aeric.\+coroutinery.\+Coroutine\+Manager.\+Log\+Steps\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/personal/coroutinery/\+Coroutinery/\+Assets/coroutinery/\+Scripts/\mbox{\hyperlink{_coroutine_manager_8cs}{Coroutine\+Manager.\+cs}}\end{DoxyCompactItemize}
