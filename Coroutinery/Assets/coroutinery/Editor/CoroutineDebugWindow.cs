@@ -8,9 +8,13 @@ using UnityEngine;
 
 namespace aeric.coroutinery
 {
+    /// <summary>
+    /// GUI for managing coroutines.
+    /// </summary>
     public class CoroutineDebugWindow : EditorWindow
     {
         private const string IconPath_Base = "/Editor/Resources/";
+        private const string IconPath_Logo = IconPath_Base + "logo_small_transparent.png";
         private const string IconPath_StackPtr = IconPath_Base + "aeric_stack_ptr.png";
         private const string IconPath_Selected = IconPath_Base + "aeric_selected.png";
         private const string IconPath_Help = IconPath_Base + "aeric_help.png";
@@ -19,7 +23,7 @@ namespace aeric.coroutinery
         private const string IconPath_Step = IconPath_Base + "aeric_step.png";
         private const string IconPath_Pause = IconPath_Base + "aeric_pause.png";
         private const string IconPath_Reset = IconPath_Base + "aeric_reset.png";
-        private const string HelpUrl = "http://aeric.games/rwnd/api/html/index.html";
+        private const string HelpUrl = "http://aeric.games/coroutinedebugger/api/html/index.html";
         private const string WindowTitle = "Coroutine Debugger";
 
         private static Color _highlightColor = new Color(0.7f, 0.8f, 0.9f, 1f);
@@ -33,7 +37,7 @@ namespace aeric.coroutinery
         {
             CoroutineDebugWindow wnd = GetWindow<CoroutineDebugWindow>();
 
-            wnd.titleContent = new GUIContent(WindowTitle, LoadCachedTexture(IconPath_StackPtr));
+            wnd.titleContent = new GUIContent(WindowTitle, LoadCachedTexture(IconPath_Logo));
             wnd.wantsLessLayoutEvents = false;
             wnd.wantsMouseMove = true;
             wnd.autoRepaintOnSceneChange = true;

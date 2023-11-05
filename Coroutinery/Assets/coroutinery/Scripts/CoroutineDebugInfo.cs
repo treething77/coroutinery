@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace aeric.coroutinery
 {
+    /// <summary>
+    /// Contains the source mapping for a single coroutine type.
+    /// </summary>
     [Serializable]
     public class CoroutineSourceMapping
     {
@@ -16,6 +19,9 @@ namespace aeric.coroutinery
         public string outerTypeName;
     }
 
+    /// <summary>
+    /// Contains the source info for a single coroutine.
+    /// </summary>
     public class SourceInfo
     {
         public string url;
@@ -24,6 +30,9 @@ namespace aeric.coroutinery
         public string outerTypeName;
     }
 
+    /// <summary>
+    /// Acts as a container for source mapping. Has a helper method to get a source info object for a given coroutine enumerator in a given state.
+    /// </summary>
     [Serializable]
     public class CoroutineAssemblySourceMappings
     {
@@ -40,24 +49,24 @@ namespace aeric.coroutinery
             sourceMapping.Clear();
         }
 
-        internal SourceInfo GetSourceInfo(IEnumerator c, int stateValue)
+        internal SourceInfo GetSourceInfo(IEnumerator coroutineEnumerator, int stateValue)
         {
-            Type type = c.GetType();
+            Type enumeratorType = coroutineEnumerator.GetType();
             CoroutineSourceMapping typeMapping = sourceMapping.Find((x) =>
             {
-                return x.typeName == type.Name && x.typeNamespace == type.Namespace;
+                return x.typeName == enumeratorType.Name && x.typeNamespace == enumeratorType.Namespace;
             });
 
             if (typeMapping == null)
             {
-                Debug.Log("No source mapping found for type " + type.Name + " in namespace " + type.Namespace);
+                Debug.Log("No source mapping found for type " + enumeratorType.Name + " in namespace " + enumeratorType.Namespace);
                 return null;
             }
 
             if (stateValue >= typeMapping.stateSourcePoints.Length)
             {
                 stateValue = 0;
-                Debug.Log("State value " + stateValue + " is out of range for type " + type.Name + " in namespace " + type.Namespace);
+                Debug.Log("State value " + stateValue + " is out of range for type " + enumeratorType.Name + " in namespace " + enumeratorType.Namespace);
             }
 
             int sourcePoint = typeMapping.stateSourcePoints[stateValue];
@@ -65,7 +74,7 @@ namespace aeric.coroutinery
             SourceInfo sourceInfo = new SourceInfo();
             sourceInfo.url = typeMapping.sourceUrl;
             sourceInfo.lineNumber = sourcePoint;
-            sourceInfo.enumeratorTypeName = type.Name;
+            sourceInfo.enumeratorTypeName = enumeratorType.Name;
             sourceInfo.outerTypeName = typeMapping.outerTypeName;
 
             return sourceInfo;
@@ -73,6 +82,9 @@ namespace aeric.coroutinery
     }
 
 
+    /// <summary>
+    /// Contains the source mappings generated for all assemblies in the project.
+    /// </summary>
     public class CoroutineDebugInfo : ScriptableObject
     {
         //Get mapping from assembly name to source mapping

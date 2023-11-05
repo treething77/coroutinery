@@ -66,6 +66,7 @@ namespace aeric.coroutinery
             bool autoBuildMappings = EditorPrefs.GetBool("Coroutinery/Auto build source mappings", true);
             autoBuildMappings = !autoBuildMappings;
             EditorPrefs.SetBool("Coroutinery/Auto build source mappings", autoBuildMappings);
+            Menu.SetChecked("Coroutinery/Auto build source mappings", autoBuildMappings);
             Debug.Log($"Coroutinery: Auto build source mappings: {autoBuildMappings}");
         }
 

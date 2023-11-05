@@ -18,7 +18,7 @@ MonoBehaviour:
     - sourceUrl: Assets\coroutinery\Scripts\CoroutineManager.cs
       typeName: <EndOfFrameRunner>d__2
       typeNamespace: aeric.coroutinery
-      stateSourcePoints: 65000000
+      stateSourcePoints: 73000000
       outerTypeName: CoroutineUpdater
     - sourceUrl: Assets\coroutinery\Examples\RobotBattle\MoveTarget.cs
       typeName: <Bounce>d__11

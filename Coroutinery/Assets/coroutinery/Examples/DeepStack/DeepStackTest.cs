@@ -5,17 +5,6 @@ using UnityEngine;
 
 namespace aeric.demos
 {
-    public static class StartHelper
-    {
-
-        public static IEnumerator BeginCoroutine(this MonoBehaviour monoBehaviour, IEnumerator cocoForCoroutines)
-        {
-            var handle = CoroutineManager.StartCoroutine(cocoForCoroutines);
-            CoroutineManager.Instance.SetCoroutineContext(handle, monoBehaviour.gameObject);
-            return cocoForCoroutines;
-        }
-    }
-
     public class DeepStackTest : MonoBehaviour
     {
         private CoroutineHandle rootCoroutineHandle;

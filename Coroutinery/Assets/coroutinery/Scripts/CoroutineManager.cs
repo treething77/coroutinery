@@ -39,7 +39,9 @@ namespace aeric.coroutinery
 
     }
 
-    // This struct is used to keep track of coroutines. It is used to identify coroutines but does not store any state.
+    /// <summary>
+    /// This struct is used to keep track of coroutines. It is used to identify coroutines but does not store any state. 
+    /// </summary>
     public struct CoroutineHandle
     {
         public static readonly CoroutineHandle InvalidHandle = new CoroutineHandle(0);
@@ -54,6 +56,9 @@ namespace aeric.coroutinery
         }
     }
 
+    /// <summary>
+    /// Custom yield instruction that waits for a number of frames.
+    /// </summary>
     public class WaitForFrames : CustomYieldInstruction
     {
         private int _endFrame;
@@ -68,10 +73,16 @@ namespace aeric.coroutinery
         public override bool keepWaiting => framesRemaining > 0;
     }
 
+    /// <summary>
+    /// Custom yield instruction that waits for the late update phase.
+    /// </summary>
     public class WaitForLateUpdate : YieldInstruction
     {
     }
 
+    /// <summary>
+    /// Container for static references to yield instructions.
+    /// </summary>
     public static class YieldStatics
     {
         public static WaitForEndOfFrame _WaitForEndOfFrame = new WaitForEndOfFrame();
@@ -79,6 +90,9 @@ namespace aeric.coroutinery
         public static WaitForLateUpdate _WaitForLateUpdate = new WaitForLateUpdate();
     }
 
+    /// <summary>
+    /// MonoBehaviour that is responsible for triggering coroutines at the correct points in the frame.
+    /// </summary>
     public class CoroutineUpdater : MonoBehaviour
     {
         private CoroutineManager _manager;
@@ -118,6 +132,21 @@ namespace aeric.coroutinery
         }
     }
 
+    //Extension method designed to help with converting from Unity coroutines
+    public static class StartHelper
+    {
+
+        public static IEnumerator BeginCoroutine(this MonoBehaviour monoBehaviour, IEnumerator enumerator)
+        {
+            var handle = CoroutineManager.StartCoroutine(enumerator);
+            CoroutineManager.Instance.SetCoroutineContext(handle, monoBehaviour.gameObject);
+            return enumerator;
+        }
+    }
+
+    /// <summary>
+    /// Manages coroutines and provides an interface for starting, stopping, and pausing coroutines.
+    /// </summary>
     public class CoroutineManager
     {
         public enum RunPhase

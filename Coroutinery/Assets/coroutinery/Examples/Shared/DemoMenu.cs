@@ -25,7 +25,7 @@ namespace aeric.coroutinery_demos
         public void loadLabelsContext()
         {
             string baseFolderPath = AssetDatabase.GUIDToAssetPath(CoroutineManager.BaseFolderGUID);
-            SceneManager.LoadScene(baseFolderPath + "/Examples/LabelsContextTags/LabelsContextTags.unity");
+            SceneManager.LoadScene(baseFolderPath + "/Examples/Labels/Labels.unity");
         }
 
         public void loadPause()
