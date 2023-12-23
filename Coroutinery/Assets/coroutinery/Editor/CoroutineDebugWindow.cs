@@ -38,7 +38,9 @@ namespace aeric.coroutinery
             CoroutineDebugWindow wnd = GetWindow<CoroutineDebugWindow>();
 
             wnd.titleContent = new GUIContent(WindowTitle, LoadCachedTexture(IconPath_Logo));
+#if UNITY_2020_1_OR_NEWER
             wnd.wantsLessLayoutEvents = false;
+#endif
             wnd.wantsMouseMove = true;
             wnd.autoRepaintOnSceneChange = true;
 
@@ -121,7 +123,11 @@ namespace aeric.coroutinery
         void Update()
         {
             //check for conditions that should cause a repaint
+#if UNITY_2020_1_OR_NEWER
             if (EditorApplication.isPlaying && (this.hasFocus || (DateTime.Now - lastRepaint).TotalMilliseconds > 1000))
+#else
+            if (EditorApplication.isPlaying && ( (DateTime.Now - lastRepaint).TotalMilliseconds > 1000))
+#endif
             {
                 Repaint();
                 lastRepaint = DateTime.Now;
@@ -789,12 +795,14 @@ namespace aeric.coroutinery
 
 
                         EditorGUILayout.LabelField("Current State:");
+                        var rc = EditorGUILayout.GetControlRect(GUILayout.Height(1));
 
                         if (Event.current.type == EventType.MouseDown && Event.current.clickCount == 2)
                         {
-                            var rc = EditorGUILayout.GetControlRect(GUILayout.Height(20));
+                            rc.height = 20;
                             if (rc.Contains(Event.current.mousePosition))
                             {
+                                Debug.Log("Opening source file" + sourceInfo.url + " at line " + sourceInfo.lineNumber);
                                 UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(sourceInfo.url, sourceInfo.lineNumber);
                             }
                         }
@@ -900,14 +908,16 @@ namespace aeric.coroutinery
 
                             string sourceLineNumberStr = sourceLine.Substring(fileEnd + 1, sourceLine.Length - fileEnd - 1);
                             int sourceLineNumber = int.Parse(sourceLineNumberStr);
+                            var rc = EditorGUILayout.GetControlRect(GUILayout.Height(1));
 
                             if (Event.current.type == EventType.MouseDown && Event.current.clickCount == 2)
                             {
-                                var rc = EditorGUILayout.GetControlRect(GUILayout.Height(20));
+                                rc.height = 20;
                                 if (rc.Contains(Event.current.mousePosition))
                                 {
+                                    Debug.Log("Opening source file" + sourceFile + " at line " + sourceLineNumber);
                                     UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(sourceFile, sourceLineNumber);
-                                }
+                                } 
                             }
 
                             using (new EditorGUILayout.HorizontalScope())
