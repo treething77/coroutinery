@@ -166,7 +166,13 @@ namespace aeric.coroutinery
 
                     //Get the relative path of the source file
                     string fullUrl = m.DebugInformation.SequencePoints[0].Document.Url;
-                    string url = fullUrl.Substring(fullUrl.IndexOf("Assets"));
+                    int assetsFolderIndex = fullUrl.IndexOf("Assets");
+                    //If the source file is not within the Assets folder then take the full url
+                    if (assetsFolderIndex == -1) {
+                        assetsFolderIndex = 0;
+                    }
+
+                    string url = fullUrl.Substring(assetsFolderIndex);
                     sourceMapping.sourceUrl = url;
 
                     //Most coroutines will have a switch on the current state
